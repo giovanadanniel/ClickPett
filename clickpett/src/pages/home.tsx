@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 import './style.css';
 
@@ -111,24 +113,7 @@ const ClickPetHome: React.FC = () => {
 
   return (
     <div className="page">
-      <header>
-        <div className="header-container">
-          <img src="images/logoSemFundo.png" alt="ClickPet Logo" className="logo" />
-          <form className="search-bar">
-            <input type="text" placeholder="O que seu pet precisa?" />
-            <button type="submit">🔍</button>
-          </form>
-          <nav>
-            <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/sobre">Sobre</Link></li>
-              <li><Link to="/servicos">Serviços</Link></li>
-              <li><Link to="/contato">Contato</Link></li>
-            </ul>
-          </nav>
-          <Link to="/login" className="login-btn">Login</Link>
-        </div>
-      </header>
+      <Header /> {/* Usa o componente Header */}
 
       <main>
         <section className="hero">
@@ -294,35 +279,8 @@ const ClickPetHome: React.FC = () => {
         </section>
       </main>
 
-      <footer>
-        <div className="footer-container">
-          <div className="footer-section">
-            <div className="footer-logo">ClickPet</div>
-            <p>Cuidando do seu pet com amor e dedicação desde 2025.</p>
-          </div>
-
-          <div className="footer-section">
-            <h3>Links Rápidos</h3>
-            <ul>
-                <li><Link to="/sobre">Sobre Nós</Link></li>
-                <li><Link to="/servicos">Nossos Serviços</Link></li>
-                <li><Link to="/faq">Perguntas Frequentes</Link></li>
-            </ul>
-          </div>
-
-          <div className="footer-section">
-            <h3>Contato</h3>
-            <ul>
-              <li>📞 (99) 99999-9999</li>
-              <li>✉️ contato@clickpet.com.br</li>
-              <li>📍 Curitiba, Brasil</li>
-            </ul>
-          </div>
-        </div>
-        <div className="copyright">
-          &copy; 2023 ClickPet. Todos os direitos reservados.
-        </div>
-      </footer>
+    <Footer /> {/* Usa o componente Footer */}
+      
     </div>
   );
 };
