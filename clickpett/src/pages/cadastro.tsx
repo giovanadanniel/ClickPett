@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import './style.css';
 
@@ -119,13 +120,13 @@ export default function Cadastro() {
           </form>
           <nav>
             <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/sobre">Sobre</a></li>
-              <li><a href="/servico">Serviços</a></li>
-              <li><a href="/contato">Contato</a></li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/sobre">Sobre</Link></li>
+              <li><Link to="/servicos">Serviços</Link></li>
+              <li><Link to="/contato">Contato</Link></li>
             </ul>
           </nav>
-          <a href="/login" className="login-btn">Login</a>
+          <Link to="/login" className="login-btn">Login</Link>
         </div>
       </header>
 
@@ -204,9 +205,9 @@ export default function Cadastro() {
           <div className="footer-section">
             <h3>Links Rápidos</h3>
             <ul>
-              <li><a href="/sobre">Sobre Nós</a></li>
-              <li><a href="/servico">Nossos Serviços</a></li>
-              <li><a href="/faq">Perguntas Frequentes</a></li>
+              <li><Link to="/sobre">Sobre Nós</Link></li>
+              <li><Link to="/servicos">Nossos Serviços</Link></li>
+              <li><Link to="/faq">Perguntas Frequentes</Link></li>
             </ul>
           </div>
           <div className="footer-section">
