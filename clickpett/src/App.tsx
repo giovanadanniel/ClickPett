@@ -8,6 +8,7 @@ import ContatoPage from './pages/cantato';
 import Servicos from './pages/servicos';
 import ReservaServico from './pages/reserva';
 import FAQPage from './pages/faq'; 
+import EditarConta from './pages/editarConta';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/servicos" element={<Servicos />} />
         <Route path="/reserva" element={<ReservaServico />} />
         <Route path="/faq" element={<FAQPage />} /> 
+        <Route path="/editar-conta" element={<EditarConta />} />
       </Routes>
     </Router>
   );

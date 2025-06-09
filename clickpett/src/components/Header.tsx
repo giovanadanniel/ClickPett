@@ -4,18 +4,36 @@ import '../pages/style.css';
 
 const Header: React.FC = () => {
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [menuAberto, setMenuAberto] = useState(false); // Estado para controlar o menu
 
   useEffect(() => {
     // Recuperar o nome do usuário do localStorage
     const nome = localStorage.getItem('nomeUsuario');
     setNomeUsuario(nome);
+
+    // Adicionar um listener para mudanças no localStorage
+    const handleStorageChange = () => {
+      const updatedNome = localStorage.getItem('nomeUsuario');
+      setNomeUsuario(updatedNome);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleLogout = () => {
     // Remover o nome do usuário do localStorage
     localStorage.removeItem('nomeUsuario');
+    localStorage.removeItem('token'); // Remover o token também
     setNomeUsuario(null); // Atualizar o estado para refletir o logout
     window.location.reload(); // Recarregar a página para atualizar o estado
+  };
+
+  const toggleMenu = () => {
+    setMenuAberto(!menuAberto); // Alternar a visibilidade do menu
   };
 
   return (
@@ -36,10 +54,18 @@ const Header: React.FC = () => {
         </nav>
         <div className="user-actions">
           {nomeUsuario ? (
-            <>
-              <button className="login-btn">Olá, {nomeUsuario}</button>
-              <button className="logout-btn" onClick={handleLogout}>Sair</button>
-            </>
+            <div className="dropdown">
+              <button className="login-btn" onClick={toggleMenu}>
+                Olá, {nomeUsuario}
+              </button>
+              {menuAberto && (
+                <div className="dropdown-menu">
+                  <Link to="/editar-conta" className="dropdown-item">Editar Conta</Link>
+                  <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link>
+                  <button className="dropdown-item logout-btn" onClick={handleLogout}>Sair</button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link to="/login" className="login-btn">Login</Link>
           )}

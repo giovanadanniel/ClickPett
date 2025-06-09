@@ -126,6 +126,53 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+app.get('/api/usuario', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `SELECT Nome_Cliente AS nome, E_mail AS email, Telefone AS telefone, CPF AS cpf FROM Cliente WHERE ID_Cliente = ?`;
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar dados do usuário:', err);
+      return res.status(500).json({ error: 'Erro ao buscar dados do usuário!' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado!' });
+    }
+
+    res.status(200).json(results[0]);
+  });
+});
+
+app.put('/api/usuario', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  const { nome, email, telefone, cpf } = req.body;
+
+  const sql = `UPDATE Cliente SET Nome_Cliente = ?, E_mail = ?, Telefone = ?, CPF = ? WHERE ID_Cliente = ?`;
+  db.query(sql, [nome, email, telefone, cpf, userId], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar dados do usuário:', err);
+      return res.status(500).json({ error: 'Erro ao atualizar dados do usuário!' });
+    }
+
+    res.status(200).json({ message: 'Dados atualizados com sucesso!' });
+  });
+});
+
+app.delete('/api/usuario', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  const sql = `DELETE FROM Cliente WHERE ID_Cliente = ?`;
+  db.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.error('Erro ao excluir a conta:', err);
+      return res.status(500).json({ error: 'Erro ao excluir a conta!' });
+    }
+
+    res.status(200).json({ message: 'Conta excluída com sucesso!' });
+  });
+});
+
 // Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);

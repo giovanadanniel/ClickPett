@@ -1226,7 +1226,88 @@ footer {
   font-size: 0.9em;
 }
 
+
+/* Estilo do botão de login */
+.login-btn {
+  background-color: transparent;
+  color: #0056b3;
+  border: 2px solid #0056b3;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-left: 15px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.login-btn:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+/* Estilo do menu dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 10px 0;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: background-color 0.3s;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  text-align: left;
+  width: 50%;
+}
+
 .logout-btn:hover {
+  background-color: #f5f5f5;
+  color: #c0392b;
+}
+
+.delete-btn {
+  background-color: transparent;
+  color: #e74c3c; /* Vermelho */
+  border: 2px solid #e74c3c;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 15px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.delete-btn:hover {
   background-color: #e74c3c; /* Vermelho preenchido */
   color: white;
 }
