@@ -28,42 +28,56 @@ db.connect((err) => {
   console.log('Conectado ao banco de dados!');
 });
 
-
 // Rota para cadastro
 app.post('/api/cadastro', async (req, res) => {
   const { nome, email, telefone, cpf, senha } = req.body;
-
-  console.log('Dados recebidos:', { nome, email, telefone, cpf, senha });
 
   // Remover formatação do CPF e telefone
   const telefoneSemFormatacao = telefone.replace(/\D/g, '');
   const cpfSemFormatacao = cpf.replace(/\D/g, '');
 
-  console.log('Dados formatados:', { telefoneSemFormatacao, cpfSemFormatacao });
-
-  try {
-    // Criptografar a senha
-    const saltRounds = 10;
-    const hashedSenha = await bcrypt.hash(senha, saltRounds);
-
-    // Inserir no banco de dados
-    const sql = `
-      INSERT INTO Cliente (Nome_Cliente, E_mail, CPF, Telefone, Senha, Papel)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const values = [nome, email, cpfSemFormatacao, telefoneSemFormatacao, hashedSenha, 1]; // Papel = 1 (exemplo)
-
-    db.query(sql, values, (err, result) => {
-      if (err) {
-        console.error('Erro ao inserir no banco de dados:', err);
-        return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
-      }
-      res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
-    });
-  } catch (err) {
-    console.error('Erro ao criptografar a senha:', err);
-    res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+  // Validação: CPF deve ter exatamente 11 dígitos
+  if (!/^[0-9]{11}$/.test(cpfSemFormatacao)) {
+    return res.status(400).json({ error: 'CPF deve conter exatamente 11 dígitos numéricos.' });
   }
+
+  // Verificar se o CPF já existe
+  db.query('SELECT 1 FROM Cliente WHERE CPF = ?', [cpfSemFormatacao], async (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar CPF:', err);
+      return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+    }
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'CPF JÁ EXISTE' });
+    }
+
+    try {
+      // Criptografar a senha
+      const saltRounds = 10;
+      const hashedSenha = await bcrypt.hash(senha, saltRounds);
+
+      // Inserir no banco de dados
+      const sql = `
+        INSERT INTO Cliente (Nome_Cliente, E_mail, CPF, Telefone, Senha, Papel)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      const values = [nome, email, cpfSemFormatacao, telefoneSemFormatacao, hashedSenha, 1]; // Papel = 1 (exemplo)
+
+      db.query(sql, values, (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ error: 'CPF JÁ EXISTE' });
+          }
+          console.error('Erro ao inserir no banco de dados:', err);
+          return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+        }
+        res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+      });
+    } catch (err) {
+      console.error('Erro ao criptografar a senha:', err);
+      res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+    }
+  });
 });
 
 const jwt = require('jsonwebtoken');
@@ -115,7 +129,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
- const authenticateToken = (req, res, next) => {
+const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) {
@@ -380,6 +394,24 @@ app.post('/api/refresh-token', authenticateToken, (req, res) => {
   const newToken = jwt.sign({ id: user.id, nome: user.nome }, SECRET_KEY, { expiresIn: '1h' });
 
   res.status(200).json({ token: newToken });
+});
+
+// Rota para checar se CPF já existe
+app.get('/api/cadastro', (req, res) => {
+  const cpf = req.query.cpf;
+  if (!cpf) {
+    return res.status(400).json({ error: 'CPF não fornecido!' });
+  }
+  db.query('SELECT 1 FROM Cliente WHERE CPF = ?', [cpf], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar CPF:', err);
+      return res.status(500).json({ error: 'Erro ao verificar CPF!' });
+    }
+    if (results.length > 0) {
+      return res.json({ exists: true });
+    }
+    res.json({ exists: false });
+  });
 });
 
 // Iniciar o servidor
