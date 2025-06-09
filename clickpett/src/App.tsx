@@ -12,6 +12,8 @@ import EditarConta from './pages/editarConta';
 import CadastrarPet from './pages/cadastroPet';
 import MeusPets from './pages/MeusPets';
 import EditarPet from './pages/EditarPet';
+import CadastroServico from './pages/CadastroServico';
+import MeusServicos from './pages/MeusServicos';
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
         <Route path="/cadastrar-pet" element={<CadastrarPet />} />
         <Route path="/meus-pets" element={<MeusPets />} />
         <Route path="/editar-pet/:id" element={<EditarPet />} />
+        <Route path="/cadastrar-servico" element={<CadastroServico />} />
+        <Route path="/meus-servicos" element={<MeusServicos />} />
       </Routes>
     </Router>
   );

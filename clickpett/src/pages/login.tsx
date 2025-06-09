@@ -41,7 +41,9 @@ const ClickPetLogin: React.FC = () => {
 
     // Armazenar o token JWT e o nome do usuário no localStorage
     localStorage.setItem('token', data.token);
+    localStorage.setItem('clienteId', data.user.id);
     localStorage.setItem('nomeUsuario', data.user.nome);
+    localStorage.setItem('papelUsuario', data.user.papel.toString());
 
     // Exibir aviso de sucesso com SweetAlert2
     await Swal.fire({

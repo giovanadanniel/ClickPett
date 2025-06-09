@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../pages/style.css'; 
+import '../pages/style.css';
 
 const Header: React.FC = () => {
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [papelUsuario, setPapelUsuario] = useState<number | null>(null); // Estado para armazenar o papel do usuário
   const [menuAberto, setMenuAberto] = useState(false); // Estado para controlar o menu
 
   useEffect(() => {
-    // Recuperar o nome do usuário do localStorage
+    // Recuperar o nome e papel do usuário do localStorage
     const nome = localStorage.getItem('nomeUsuario');
+    const papel = localStorage.getItem('papelUsuario'); // Recupera o papel do usuário
     setNomeUsuario(nome);
+    setPapelUsuario(papel ? parseInt(papel, 10) : null);
 
     // Adicionar um listener para mudanças no localStorage
     const handleStorageChange = () => {
       const updatedNome = localStorage.getItem('nomeUsuario');
+      const updatedPapel = localStorage.getItem('papelUsuario');
       setNomeUsuario(updatedNome);
+      setPapelUsuario(updatedPapel ? parseInt(updatedPapel, 10) : null);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -25,10 +30,12 @@ const Header: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    // Remover o nome do usuário do localStorage
+    // Remover o nome e papel do usuário do localStorage
     localStorage.removeItem('nomeUsuario');
+    localStorage.removeItem('papelUsuario');
     localStorage.removeItem('token'); // Remover o token também
     setNomeUsuario(null); // Atualizar o estado para refletir o logout
+    setPapelUsuario(null);
     window.location.reload(); // Recarregar a página para atualizar o estado
   };
 
@@ -60,9 +67,20 @@ const Header: React.FC = () => {
               </button>
               {menuAberto && (
                 <div className="dropdown-menu">
-                  <Link to="/editar-conta" className="dropdown-item">Editar Conta</Link>
-                  <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link> 
-                  <Link to="/meus-pets" className="dropdown-item">Meus Pets</Link> 
+                  {papelUsuario === 1 && (
+                    <>
+                      <Link to="/editar-conta" className="dropdown-item">Editar Usuário</Link>
+                      <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link>
+                      <Link to="/meus-pets" className="dropdown-item">Meus Pets</Link>
+                    </>
+                  )}
+                  {papelUsuario === 2 && (
+                    <>
+                      <Link to="/editar-conta" className="dropdown-item">Editar Usuário</Link>
+                      <Link to="/cadastrar-servico" className="dropdown-item">Cadastrar Serviço</Link>
+                      <Link to="/meus-servicos" className="dropdown-item">Meus Serviços</Link> {/* Adicionado */}
+                    </>
+                  )}
                   <button className="dropdown-item logout-btn" onClick={handleLogout}>Sair</button>
                 </div>
               )}

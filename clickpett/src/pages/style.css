@@ -1383,4 +1383,36 @@ footer {
   color: white;
 }
 
+/* Estilo para a página de Meus Serviços */
+.meus-servicos-page {
+  padding: 20px;
+  text-align: center;
+}
+
+.servicos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.servico-card {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.servico-card h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.servico-card p {
+  font-size: 1.2em;
+  color: #333;
+}
+
 }
