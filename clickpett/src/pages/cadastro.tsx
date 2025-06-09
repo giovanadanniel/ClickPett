@@ -21,8 +21,36 @@ export default function Cadastro() {
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
 
+  // Função para validar CPF (formato e dígitos)
+  function validarCPF(cpf: string) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^([0-9])\1+$/.test(cpf)) return false;
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+    return true;
+  }
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    if (id === 'cpf') {
+      // Não permite letras e limita a 11 dígitos
+      const onlyNumbers = value.replace(/\D/g, '').slice(0, 11);
+      let formattedCPF = onlyNumbers.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{0,2})/,
+        (match, p1, p2, p3, p4) =>
+          p4 ? `${p1}.${p2}.${p3}-${p4}` : `${p1}.${p2}.${p3}`
+      );
+      setForm((prevForm) => ({ ...prevForm, cpf: formattedCPF }));
+      return;
+    }
 
     setForm((prevForm) => {
       if (id === 'telefone') {
@@ -36,18 +64,6 @@ export default function Cadastro() {
         return {
           ...prevForm,
           telefone: telefoneFormatado,
-        };
-      }
-
-      if (id === 'cpf') {
-        const formattedCPF = value.replace(/\D/g, '').replace(
-          /(\d{3})(\d{3})(\d{3})(\d{0,2})/,
-          (match, p1, p2, p3, p4) =>
-            p4 ? `${p1}.${p2}.${p3}-${p4}` : `${p1}.${p2}.${p3}`
-        );
-        return {
-          ...prevForm,
-          cpf: formattedCPF,
         };
       }
 
@@ -121,10 +137,24 @@ export default function Cadastro() {
     if (checkPasswordStrength(senha) < 3) return Swal.fire({ title: 'Erro', text: 'A senha deve atender a pelo menos 3 dos 4 critérios de força!', icon: 'error', background: '#121212', color: '#fff' });
     if (senha !== confirmarSenha) return Swal.fire({ title: 'Erro', text: 'As senhas não coincidem!', icon: 'error', background: '#121212', color: '#fff' });
 
+    // Validação de CPF
+    if (!validarCPF(cpf)) {
+      return Swal.fire({ title: 'Erro', text: 'Digite um CPF válido!', icon: 'error', background: '#121212', color: '#fff' });
+    }
+
     const telefoneSemFormatacao = telefone.replace(/\D/g, '');
     const cpfSemFormatacao = cpf.replace(/\D/g, '');
 
     try {
+      // Verifica se o CPF já existe antes de cadastrar
+      const checkCpf = await fetch(`http://localhost:5000/api/cadastro?cpf=${cpfSemFormatacao}`);
+      if (checkCpf.ok) {
+        const exists = await checkCpf.json();
+        if (exists.exists) {
+          return Swal.fire({ title: 'Erro', text: 'Este CPF já está cadastrado!', icon: 'error', background: '#121212', color: '#fff' });
+        }
+      }
+
       const response = await fetch('http://localhost:5000/api/cadastro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
