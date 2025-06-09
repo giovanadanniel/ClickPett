@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
@@ -10,13 +10,46 @@ export default function Cadastro() {
     nome: '',
     email: '',
     telefone: '',
+    cpf: '',
     senha: '',
     confirmarSenha: ''
   });
 
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+
+    setForm((prevForm) => {
+      if (id === 'telefone') {
+        const x = value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,1})(\d{0,4})(\d{0,4})/);
+        const telefoneFormatado = x
+          ? !x[2]
+            ? x[1]
+            : `(${x[1]}) ${x[2]}${x[3] ? ` ${x[3]}${x[4] ? `-${x[4]}` : ''}` : ''}`
+          : value;
+
+        return {
+          ...prevForm,
+          telefone: telefoneFormatado,
+        };
+      }
+
+      if (id === 'cpf') {
+        const formattedCPF = value.replace(/\D/g, '').replace(
+          /(\d{3})(\d{3})(\d{3})(\d{0,2})/,
+          (match, p1, p2, p3, p4) =>
+            p4 ? `${p1}.${p2}.${p3}-${p4}` : `${p1}.${p2}.${p3}`
+        );
+        return {
+          ...prevForm,
+          cpf: formattedCPF,
+        };
+      }
+
+      return {
+        ...prevForm,
+        [id]: value,
+      };
+    });
   };
 
   const checkPasswordStrength = (password: string) => {
@@ -29,27 +62,11 @@ export default function Cadastro() {
   };
 
   useEffect(() => {
-    // Máscara para telefone
-    const telInput = document.getElementById('telefone') as HTMLInputElement;
-    if (telInput) {
-      telInput.addEventListener('input', function () {
-        const x = telInput.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,1})(\d{0,4})(\d{0,4})/);
-        if (x) {
-          telInput.value = !x[2]
-            ? x[1]
-            : `(${x[1]}) ${x[2]}${x[3] ? ` ${x[3]}${x[4] ? `-${x[4]}` : ''}` : ''}`;
-        }
-      });
-    }
-
-    // Força da senha
     const senhaInput = document.getElementById('senha') as HTMLInputElement;
     const strengthBar = document.getElementById('passwordStrengthBar');
     const lengthIcon = document.getElementById('lengthIcon');
     const numberIcon = document.getElementById('numberIcon');
     const specialIcon = document.getElementById('specialIcon');
-
-    console.log({ senhaInput, strengthBar, lengthIcon, numberIcon, specialIcon });
 
     if (!senhaInput || !strengthBar || !lengthIcon || !numberIcon || !specialIcon) return;
 
@@ -81,40 +98,48 @@ export default function Cadastro() {
     };
 
     senhaInput.addEventListener('input', updatePasswordUI);
-    return () => {
-      senhaInput.removeEventListener('input', updatePasswordUI);
-    };
+    return () => senhaInput.removeEventListener('input', updatePasswordUI);
   }, []);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const { nome, email, telefone, cpf, senha, confirmarSenha } = form;
 
-    const { nome, email, telefone, senha, confirmarSenha } = form;
-
-    if (!nome.trim()) {
-      return Swal.fire({ title: 'Erro', text: 'O campo Nome é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    }
+    if (!nome.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Nome é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
+    if (!telefone.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Telefone é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
+    if (!cpf.trim()) return Swal.fire({ title: 'Erro', text: 'O campo CPF é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return Swal.fire({ title: 'Erro', text: 'Digite um email válido! Exemplo: nome@exemplo.com', icon: 'error', background: '#121212', color: '#fff' });
-    }
+    if (!emailRegex.test(email)) return Swal.fire({ title: 'Erro', text: 'Digite um email válido!', icon: 'error', background: '#121212', color: '#fff' });
 
-    if (checkPasswordStrength(senha) < 3) {
-      return Swal.fire({ title: 'Erro', text: 'A senha deve atender a pelo menos 3 dos 4 critérios de força!', icon: 'error', background: '#121212', color: '#fff' });
-    }
+    if (checkPasswordStrength(senha) < 3) return Swal.fire({ title: 'Erro', text: 'A senha deve atender a pelo menos 3 dos 4 critérios de força!', icon: 'error', background: '#121212', color: '#fff' });
+    if (senha !== confirmarSenha) return Swal.fire({ title: 'Erro', text: 'As senhas não coincidem!', icon: 'error', background: '#121212', color: '#fff' });
 
-    if (senha !== confirmarSenha) {
-      return Swal.fire({ title: 'Erro', text: 'As senhas não coincidem!', icon: 'error', background: '#121212', color: '#fff' });
-    }
+    const telefoneSemFormatacao = telefone.replace(/\D/g, '');
+    const cpfSemFormatacao = cpf.replace(/\D/g, '');
 
-    Swal.fire({ title: 'Sucesso!', text: 'Cadastro realizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' });
+    try {
+      const response = await fetch('http://localhost:5000/api/cadastro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, telefone: telefoneSemFormatacao, cpf: cpfSemFormatacao, senha }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao cadastrar cliente!');
+      }
+
+      Swal.fire({ title: 'Sucesso!', text: 'Cadastro realizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' });
+      setForm({ nome: '', email: '', telefone: '', cpf: '', senha: '', confirmarSenha: '' });
+    } catch (error: any) {
+      Swal.fire({ title: 'Erro', text: error.message, icon: 'error', background: '#121212', color: '#fff' });
+    }
   };
 
   return (
     <>
-      <Header /> {/* Usa o componente Header */}
-
+      <Header />
       <div className="register-page">
         <div className="register-hero">
           <div className="hero-content">
@@ -129,27 +154,26 @@ export default function Cadastro() {
             <form className="register-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="nome">Nome Completo</label>
-                <input type="text" id="nome" placeholder="Digite seu nome completo" value={form.nome} onChange={handleChange} />
+                <input type="text" id="nome" value={form.nome} onChange={handleChange} placeholder="Digite seu nome completo" />
               </div>
-
               <div className="form-group">
                 <label htmlFor="email">E-mail</label>
-                <input type="email" id="email" placeholder="Digite seu e-mail" value={form.email} onChange={handleChange} />
+                <input type="email" id="email" value={form.email} onChange={handleChange} placeholder="Digite seu e-mail" />
               </div>
-
               <div className="form-group">
                 <label htmlFor="telefone">Telefone</label>
-                <input type="tel" id="telefone" placeholder="(00) 0 0000-0000" value={form.telefone} onChange={handleChange} />
+                <input type="tel" id="telefone" value={form.telefone} onChange={handleChange} placeholder="(00) 0 0000-0000" />
               </div>
-
+              <div className="form-group">
+                <label htmlFor="cpf">CPF</label>
+                <input type="text" id="cpf" value={form.cpf} onChange={handleChange} placeholder="Digite seu CPF" />
+              </div>
               <div className="form-group">
                 <label htmlFor="senha">Senha</label>
-                <input type="password" id="senha" placeholder="Crie uma senha" value={form.senha} onChange={handleChange} />
-
+                <input type="password" id="senha" value={form.senha} onChange={handleChange} placeholder="Crie uma senha" />
                 <div className="password-strength">
                   <div className="password-strength-bar" id="passwordStrengthBar"></div>
                 </div>
-
                 <div className="password-requirements">
                   <div className="requirement">
                     <span className="requirement-icon" id="lengthIcon">✗</span>
@@ -157,31 +181,30 @@ export default function Cadastro() {
                   </div>
                   <div className="requirement">
                     <span className="requirement-icon" id="numberIcon">✗</span>
-                    <span>Pelo menos 1 número</span>
+                    <span>Contém número</span>
                   </div>
                   <div className="requirement">
                     <span className="requirement-icon" id="specialIcon">✗</span>
-                    <span>Pelo menos 1 caractere especial</span>
+                    <span>Caractere especial</span>
                   </div>
                 </div>
               </div>
-
               <div className="form-group">
                 <label htmlFor="confirmarSenha">Confirmar Senha</label>
-                <input type="password" id="confirmarSenha" placeholder="Confirme sua senha" value={form.confirmarSenha} onChange={handleChange} />
+                <input type="password" id="confirmarSenha" value={form.confirmarSenha} onChange={handleChange} placeholder="Confirme sua senha" />
               </div>
-
               <button type="submit" className="register-btn">Cadastrar</button>
-            </form>
+
 
             <div className="register-options">
               <p>Já tem uma conta? <a href="/login">Faça login</a></p>
             </div>
+            
+            </form>
           </div>
         </div>
       </div>
-
-      <Footer /> {/* Usa o componente Footer */}
+      <Footer />
     </>
   );
 }
