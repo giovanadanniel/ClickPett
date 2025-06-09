@@ -39,7 +39,7 @@ const Header: React.FC = () => {
   return (
     <header>
       <div className="header-container">
-        <img src="images/logoSemFundo.png" alt="ClickPet Logo" className="logo" />
+        <img src="/images/logoSemFundo.png" alt="ClickPet Logo" className="logo" />
         <form className="search-bar">
           <input type="text" placeholder="O que seu pet precisa?" />
           <button type="submit">🔍</button>

@@ -17,44 +17,95 @@ const MeusPets: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('Token não encontrado. Redirecionando para login.');
+    navigate('/login');
+    return;
+  }
 
-    fetch('http://localhost:5000/api/meus-pets', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  fetch('http://localhost:5000/api/meus-pets', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.status === 403) {
+        // Token expirado, tente renovar
+        return fetch('http://localhost:5000/api/refresh-token', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((refreshResponse) => {
+            if (!refreshResponse.ok) {
+              throw new Error('Erro ao renovar o token');
+            }
+            return refreshResponse.json();
+          })
+          .then((data) => {
+            localStorage.setItem('token', data.token); // Salve o novo token
+            // Refaça a requisição original
+            return fetch('http://localhost:5000/api/meus-pets', {
+              headers: {
+                Authorization: `Bearer ${data.token}`,
+              },
+            });
+          });
+      }
+      return response;
     })
-      .then((response) => response.json())
-      .then((data) => setPets(data))
-      .catch((error) => console.error('Erro ao buscar pets:', error));
-  }, [navigate]);
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Erro ao buscar pets');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (Array.isArray(data)) {
+        setPets(data);
+      } else {
+        console.error('Resposta inesperada da API:', data);
+        setPets([]);
+      }
+    })
+    .catch((error) => {
+      console.error('Erro ao buscar pets:', error);
+      setPets([]);
+    });
+}, [navigate]);
 
   const handleEditar = (id: number) => {
     navigate(`/editar-pet/${id}`);
   };
 
   const handleExcluir = (id: number) => {
+    const confirmacao = window.confirm('Tem certeza de que deseja excluir este pet?');
+    if (!confirmacao) return;
+
     const token = localStorage.getItem('token');
-    fetch(`/api/pet/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    fetch(`http://localhost:5000/api/pet/${id}`, { // Corrigido para incluir o host e a porta
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
     })
       .then((response) => {
         if (response.ok) {
           setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
+          alert('Pet excluído com sucesso!');
         } else {
           console.error('Erro ao excluir pet');
+          alert('Erro ao excluir o pet.');
         }
       })
-      .catch((error) => console.error('Erro ao excluir pet:', error));
+      .catch((error) => {
+        console.error('Erro ao excluir pet:', error);
+        alert('Erro ao excluir o pet.');
+      });
   };
-
+    
   return (
     <>
       <Header /> {/* Adiciona o Header */}

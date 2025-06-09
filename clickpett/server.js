@@ -110,7 +110,7 @@ app.post('/api/login', async (req, res) => {
 });
 
  const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1]; // O token deve ser enviado no cabeçalho Authorization: Bearer <token>
+  const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) {
     console.error('Token não fornecido.');
@@ -119,29 +119,21 @@ app.post('/api/login', async (req, res) => {
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) {
+      if (err.name === 'TokenExpiredError') {
+        // Permitir tokens expirados apenas na rota de renovação
+        if (req.path === '/api/refresh-token') {
+          req.user = jwt.decode(token); // Decodifica o token sem verificar a validade
+          return next();
+        }
+        console.error('Token expirado:', err);
+        return res.status(403).json({ error: 'Token expirado!' });
+      }
       console.error('Erro ao verificar token:', err);
       return res.status(403).json({ error: 'Token inválido!' });
     }
 
-    console.log('Token decodificado:', user);
-
-    // Verificar se o usuário ainda existe no banco de dados
-    const sql = `SELECT * FROM Cliente WHERE ID_Cliente = ?`;
-    db.query(sql, [user.id], (dbErr, results) => {
-      if (dbErr) {
-        console.error('Erro ao verificar usuário no banco de dados:', dbErr);
-        return res.status(500).json({ error: 'Erro interno no servidor!' });
-      }
-
-      if (results.length === 0) {
-        console.error('Usuário não encontrado no banco de dados.');
-        return res.status(404).json({ error: 'Usuário não encontrado!' });
-      }
-
-      console.log('Usuário autenticado:', results[0]);
-      req.user = user; // Adicionar os dados do usuário à requisição
-      next();
-    });
+    req.user = user;
+    next();
   });
 };
 
@@ -240,6 +232,8 @@ app.post('/api/cadastrar-pet', authenticateToken, (req, res) => {
 app.get('/api/meus-pets', authenticateToken, (req, res) => {
   const clienteId = req.user.id;
 
+  console.log(`Buscando pets para o cliente ID = ${clienteId}`); // Log para depuração
+
   const sql = `SELECT ID_Pet AS id, Nome_Pet AS nome, Idade AS idade, Peso AS peso, Raca AS raca FROM Pet WHERE fk_Cliente__ID_Cliente = ?`;
   db.query(sql, [clienteId], (err, results) => {
     if (err) {
@@ -255,6 +249,8 @@ app.delete('/api/pet/:id', authenticateToken, (req, res) => {
   const petId = req.params.id;
   const clienteId = req.user.id;
 
+  console.log(`Tentativa de exclusão: Pet ID = ${petId}, Cliente ID = ${clienteId}`); // Log para depuração
+
   const sql = `DELETE FROM Pet WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
   db.query(sql, [petId, clienteId], (err, result) => {
     if (err) {
@@ -268,6 +264,64 @@ app.delete('/api/pet/:id', authenticateToken, (req, res) => {
 
     res.status(200).json({ message: 'Pet excluído com sucesso!' });
   });
+});
+
+app.get('/api/pet/:id', authenticateToken, (req, res) => {
+  const petId = req.params.id;
+  const clienteId = req.user.id;
+
+  console.log(`Buscando informações do pet: Pet ID = ${petId}, Cliente ID = ${clienteId}`); // Log para depuração
+
+  const sql = `SELECT ID_Pet AS id, Nome_Pet AS nome, Idade AS idade, Peso AS peso, Raca AS raca 
+               FROM Pet WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
+  db.query(sql, [petId, clienteId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar informações do pet:', err);
+      return res.status(500).json({ error: 'Erro ao buscar informações do pet!' });
+    }
+
+    if (results.length === 0) {
+      console.warn(`Nenhum pet encontrado para o ID ${petId} associado ao cliente ${clienteId}`); // Log de aviso
+      return res.status(404).json({ error: 'Pet não encontrado!' });
+    }
+
+    console.log('Informações do pet encontradas:', results[0]); // Log dos dados retornados
+    res.status(200).json(results[0]);
+  });
+});
+
+app.put('/api/pet/:id', authenticateToken, (req, res) => {
+  const petId = req.params.id;
+  const clienteId = req.user.id;
+  const { nome, idade, peso, raca } = req.body;
+
+  const sql = `UPDATE Pet SET Nome_Pet = ?, Idade = ?, Peso = ?, Raca = ? 
+               WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
+  db.query(sql, [nome, idade, peso, raca, petId, clienteId], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar informações do pet:', err);
+      return res.status(500).json({ error: 'Erro ao atualizar informações do pet!' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pet não encontrado!' });
+    }
+
+    res.status(200).json({ message: 'Pet atualizado com sucesso!' });
+  });
+});
+
+app.post('/api/refresh-token', authenticateToken, (req, res) => {
+  const user = req.user; // Dados do usuário decodificados do token antigo
+
+  if (!user || !user.id) {
+    return res.status(403).json({ error: 'Não foi possível renovar o token.' });
+  }
+
+  // Gere um novo token
+  const newToken = jwt.sign({ id: user.id, nome: user.nome }, SECRET_KEY, { expiresIn: '1h' });
+
+  res.status(200).json({ token: newToken });
 });
 
 // Iniciar o servidor
