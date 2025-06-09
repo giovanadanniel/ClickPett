@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 
 // Configuração do banco de dados
 const db = mysql.createConnection({
-  host: 'localhost', // Substitua pelo host do seu banco
+  host: '127.0.0.1', // Substitua pelo host do seu banco
   user: 'root', // Substitua pelo usuário do seu banco
-  password: '548921', // Substitua pela senha do seu banco
+  password: 'Mimiteteu123@', // Substitua pela senha do seu banco
   database: 'clickpet', // Substitua pelo nome do seu banco
 });
 
@@ -72,39 +72,45 @@ const SECRET_KEY = 'sua_chave_secreta'; // Substitua por uma chave secreta segur
 app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
 
-  console.log('Tentativa de login:', { email, senha });
-
   try {
     const sql = `SELECT * FROM Cliente WHERE E_mail = ?`;
     db.query(sql, [email], async (err, results) => {
       if (err) {
-        console.error('Erro ao buscar usuário no banco de dados:', err);
         return res.status(500).json({ error: 'Erro ao verificar login!' });
       }
-
-      console.log('Resultados da consulta:', results);
 
       if (results.length === 0) {
         return res.status(401).json({ error: 'E-mail ou senha incorretos!' });
       }
 
       const user = results[0];
-      console.log('Usuário encontrado:', user);
-
       const senhaCorreta = await bcrypt.compare(senha, user.Senha);
-      console.log('Senha correta:', senhaCorreta);
 
       if (!senhaCorreta) {
         return res.status(401).json({ error: 'E-mail ou senha incorretos!' });
       }
 
-      // Gerar o token JWT
-      const token = jwt.sign({ id: user.ID_Cliente, nome: user.Nome_Cliente }, SECRET_KEY, { expiresIn: '1h' });
+      // Gerar o token JWT com o papel do usuário
+      const token = jwt.sign(
+        { id: user.ID_Cliente, nome: user.Nome_Cliente, papel: user.Papel },
+        SECRET_KEY,
+        { expiresIn: '1h' }
+      );
 
-      res.status(200).json({ message: 'Login realizado com sucesso!', token, user: { nome: user.Nome_Cliente } });
+      res.status(200).json({
+        message: 'Login realizado com sucesso!',
+        token,
+        user: { id: user.ID_Cliente, nome: user.Nome_Cliente, papel: user.Papel },
+      });
+
+      res.status(200).json({
+        message: 'Login realizado com sucesso!',
+        token,
+        user: { id: user.ID_Cliente, nome: user.Nome_Cliente, papel: user.Papel },
+      });
+
     });
   } catch (err) {
-    console.error('Erro ao processar login:', err);
     res.status(500).json({ error: 'Erro ao processar login!' });
   }
 });
@@ -114,17 +120,12 @@ app.post('/api/login', async (req, res) => {
 
   if (!token) {
     console.error('Token não fornecido.');
-    return res.status(401).json({ error: 'Acesso negado!' });
+    return res.status(401).json({ error: 'Acesso negado! Token não encontrado.' });
   }
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) {
       if (err.name === 'TokenExpiredError') {
-        // Permitir tokens expirados apenas na rota de renovação
-        if (req.path === '/api/refresh-token') {
-          req.user = jwt.decode(token); // Decodifica o token sem verificar a validade
-          return next();
-        }
         console.error('Token expirado:', err);
         return res.status(403).json({ error: 'Token expirado!' });
       }
@@ -132,6 +133,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(403).json({ error: 'Token inválido!' });
     }
 
+    console.log('Token validado com sucesso:', user); // Log para depuração
     req.user = user;
     next();
   });
@@ -308,6 +310,62 @@ app.put('/api/pet/:id', authenticateToken, (req, res) => {
     }
 
     res.status(200).json({ message: 'Pet atualizado com sucesso!' });
+  });
+});
+
+app.post('/api/cadastrar-servico', authenticateToken, (req, res) => {
+  const { nomeServico, precoServico, clienteId } = req.body; // Receber o clienteId do corpo da requisição
+
+  if (!clienteId) {
+    console.error('ID do cliente não fornecido.');
+    return res.status(400).json({ error: 'ID do cliente é obrigatório!' });
+  }
+
+  console.log('Dados recebidos para cadastro de serviço:', { nomeServico, precoServico, clienteId });
+
+  if (!nomeServico || !precoServico || isNaN(precoServico) || precoServico <= 0) {
+    return res.status(400).json({ error: 'Nome e preço do serviço são obrigatórios e o preço deve ser um número positivo!' });
+  }
+
+  const sql = `INSERT INTO Servicos (Nome_Servico, Preco_Servico) VALUES (?, ?)`;
+  const values = [nomeServico, precoServico];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao cadastrar serviço no banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao cadastrar serviço!' });
+    }
+
+    console.log('Serviço cadastrado com sucesso:', result);
+    res.status(200).json({ message: 'Serviço cadastrado com sucesso!' });
+  });
+});
+
+app.get('/api/meus-servicos', authenticateToken, (req, res) => {
+  const clienteId = req.query.clienteId; // Receber o ID do cliente como parâmetro da requisição
+
+  if (!clienteId) {
+    console.error('ID do cliente não fornecido.');
+    return res.status(400).json({ error: 'ID do cliente é obrigatório!' });
+  }
+
+  console.log(`Buscando serviços cadastrados pelo cliente ID = ${clienteId}`); // Log para depuração
+
+  const sql = `SELECT ID_Servicos AS id, Nome_Servico AS nome, CAST(Preco_Servico AS DECIMAL(10,2)) AS preco 
+               FROM Servicos`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar serviços:', err);
+      return res.status(500).json({ error: 'Erro ao buscar serviços!' });
+    }
+
+    if (results.length === 0) {
+      console.warn(`Nenhum serviço encontrado para o cliente ID = ${clienteId}`); // Log de aviso
+      return res.status(404).json({ error: 'Nenhum serviço encontrado!' });
+    }
+
+    console.log('Serviços encontrados:', results); // Log dos serviços retornados
+    res.status(200).json(results);
   });
 });
 
