@@ -136,7 +136,10 @@ export default function Cadastro() {
         throw new Error(errorData.error || 'Erro ao cadastrar cliente!');
       }
 
-      Swal.fire({ title: 'Sucesso!', text: 'Cadastro realizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' });
+      Swal.fire({ title: 'Sucesso!', text: 'Cadastro realizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' })
+        .then(() => {
+          window.location.href = '/login';
+        });
       setForm({ nome: '', email: '', telefone: '', cpf: '', senha: '', confirmarSenha: '' });
     } catch (error: any) {
       Swal.fire({ title: 'Erro', text: error.message, icon: 'error', background: '#121212', color: '#fff' });
