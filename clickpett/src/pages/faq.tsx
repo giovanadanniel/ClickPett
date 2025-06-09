@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,10 @@ import './style.css';
 
 const FAQPage = () => {
   const [activeIndex, setActiveIndex] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.title = 'FAQ - Click Pet';
+  }, []);
 
   const toggleAnswer = (index: string) => {
     setActiveIndex(prevIndex => (prevIndex === index ? null : index));

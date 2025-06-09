@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 
 // Configuração do banco de dados
 const db = mysql.createConnection({
-  host: '', // Substitua pelo host do seu banco
+  host: 'localhost', // Substitua pelo host do seu banco
   user: 'root', // Substitua pelo usuário do seu banco
-  password: '', // Substitua pela senha do seu banco
+  password: '548921', // Substitua pela senha do seu banco
   database: 'clickpet', // Substitua pelo nome do seu banco
 });
 

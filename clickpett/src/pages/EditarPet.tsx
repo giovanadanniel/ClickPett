@@ -11,6 +11,10 @@ const EditarPet: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = 'Editar Pet - Click Pet';
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');

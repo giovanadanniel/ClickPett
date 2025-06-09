@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from "react-router-dom";
@@ -12,6 +12,10 @@ const ReservaServico = () => {
     hora: '',
     observacoes: '',
   });
+
+  useEffect(() => {
+    document.title = 'Reserva - Click Pet';
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

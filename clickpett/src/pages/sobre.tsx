@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 import './style.css';
 
 const ClickPetSobre: React.FC = () => {
+  useEffect(() => {
+    document.title = 'Sobre - Click Pet';
+  }, []);
+
   return (
     <>
       <Header /> {/* Usa o componente Header */}

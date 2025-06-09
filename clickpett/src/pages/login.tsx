@@ -10,6 +10,7 @@ const ClickPetLogin: React.FC = () => {
     email: '',
     senha: '',
   });
+  const [showSenha, setShowSenha] = useState(false);
 
   const navigate = useNavigate();
 
@@ -110,14 +111,22 @@ const fetchProtectedData = async () => {
               </div>
               <div className="form-group">
                 <label htmlFor="senha">Senha</label>
-                <input
-                  type="password"
-                  id="senha"
-                  value={form.senha}
-                  onChange={handleChange}
-                  placeholder="Digite sua senha"
-                  required
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showSenha ? 'text' : 'password'}
+                    id="senha"
+                    value={form.senha}
+                    onChange={handleChange}
+                    placeholder="Digite sua senha"
+                    required
+                  />
+                  <img
+                    src={showSenha ? '/paw-off.svg' : '/paw.svg'}
+                    alt={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setShowSenha((v) => !v)}
+                    style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer', width: 22, height: 22 }}
+                  />
+                </div>
               </div>
               <button type="submit" className="login-btn-2">Entrar</button>
             </form>

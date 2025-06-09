@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Swal from 'sweetalert2';
@@ -6,6 +6,10 @@ import './style.css';
 import { useNavigate } from 'react-router-dom';
 
 export default function EditarConta() {
+  useEffect(() => {
+    document.title = 'Editar Conta - Click Pet';
+  }, []);
+
   const [form, setForm] = useState({
     nome: '',
     email: '',

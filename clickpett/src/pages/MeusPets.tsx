@@ -17,6 +17,10 @@ const MeusPets: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = 'Meus Pets - Click Pet';
+  }, []);
+
+  useEffect(() => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.error('Token não encontrado. Redirecionando para login.');

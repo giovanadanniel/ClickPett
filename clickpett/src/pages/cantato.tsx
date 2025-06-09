@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from "react-router-dom";
 import "./style.css";
 
 function ContatoPage() {
+  useEffect(() => {
+    document.title = 'Contato - Click Pet';
+  }, []);
+
   return (
     <>
       <head>

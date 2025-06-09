@@ -111,6 +111,10 @@ const ClickPetHome: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    document.title = 'Home - Click Pet';
+  }, []);
+
   return (
     <div className="page">
       <Header /> {/* Usa o componente Header */}

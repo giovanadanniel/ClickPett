@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,10 @@ import Swal from 'sweetalert2';
 import './style.css';
 
 export default function Cadastro() {
+  useEffect(() => {
+    document.title = 'Cadastro - Click Pet';
+  }, []);
+
   const [form, setForm] = useState({
     nome: '',
     email: '',
@@ -14,6 +18,8 @@ export default function Cadastro() {
     senha: '',
     confirmarSenha: ''
   });
+  const [showSenha, setShowSenha] = useState(false);
+  const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -170,7 +176,21 @@ export default function Cadastro() {
               </div>
               <div className="form-group">
                 <label htmlFor="senha">Senha</label>
-                <input type="password" id="senha" value={form.senha} onChange={handleChange} placeholder="Crie uma senha" />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showSenha ? 'text' : 'password'}
+                    id="senha"
+                    value={form.senha}
+                    onChange={handleChange}
+                    placeholder="Crie uma senha"
+                  />
+                  <img
+                    src={showSenha ? '/paw-off.svg' : '/paw.svg'}
+                    alt={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setShowSenha((v) => !v)}
+                    style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer', width: 22, height: 22 }}
+                  />
+                </div>
                 <div className="password-strength">
                   <div className="password-strength-bar" id="passwordStrengthBar"></div>
                 </div>
@@ -191,7 +211,21 @@ export default function Cadastro() {
               </div>
               <div className="form-group">
                 <label htmlFor="confirmarSenha">Confirmar Senha</label>
-                <input type="password" id="confirmarSenha" value={form.confirmarSenha} onChange={handleChange} placeholder="Confirme sua senha" />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showConfirmarSenha ? 'text' : 'password'}
+                    id="confirmarSenha"
+                    value={form.confirmarSenha}
+                    onChange={handleChange}
+                    placeholder="Confirme sua senha"
+                  />
+                  <img
+                    src={showConfirmarSenha ? '/paw-off.svg' : '/paw.svg'}
+                    alt={showConfirmarSenha ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setShowConfirmarSenha((v) => !v)}
+                    style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer', width: 22, height: 22 }}
+                  />
+                </div>
               </div>
               <button type="submit" className="register-btn">Cadastrar</button>
 

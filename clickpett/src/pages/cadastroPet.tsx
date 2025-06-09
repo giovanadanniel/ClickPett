@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useEffect, useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importar o hook useNavigate
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -6,6 +6,10 @@ import Swal from 'sweetalert2';
 import './style.css';
 
 export default function CadastrarPet() {
+  useEffect(() => {
+    document.title = 'Cadastrar Pet - Click Pet';
+  }, []);
+
   const [form, setForm] = useState({
     nome: '',
     idade: '',
