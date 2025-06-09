@@ -109,20 +109,39 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-const authenticateToken = (req, res, next) => {
+ const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1]; // O token deve ser enviado no cabeçalho Authorization: Bearer <token>
 
   if (!token) {
+    console.error('Token não fornecido.');
     return res.status(401).json({ error: 'Acesso negado!' });
   }
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
     if (err) {
+      console.error('Erro ao verificar token:', err);
       return res.status(403).json({ error: 'Token inválido!' });
     }
 
-    req.user = user; // Adiciona os dados do usuário ao objeto da requisição
-    next();
+    console.log('Token decodificado:', user);
+
+    // Verificar se o usuário ainda existe no banco de dados
+    const sql = `SELECT * FROM Cliente WHERE ID_Cliente = ?`;
+    db.query(sql, [user.id], (dbErr, results) => {
+      if (dbErr) {
+        console.error('Erro ao verificar usuário no banco de dados:', dbErr);
+        return res.status(500).json({ error: 'Erro interno no servidor!' });
+      }
+
+      if (results.length === 0) {
+        console.error('Usuário não encontrado no banco de dados.');
+        return res.status(404).json({ error: 'Usuário não encontrado!' });
+      }
+
+      console.log('Usuário autenticado:', results[0]);
+      req.user = user; // Adicionar os dados do usuário à requisição
+      next();
+    });
   });
 };
 
@@ -170,6 +189,84 @@ app.delete('/api/usuario', authenticateToken, (req, res) => {
     }
 
     res.status(200).json({ message: 'Conta excluída com sucesso!' });
+  });
+});
+
+app.post('/api/cadastrar-pet', authenticateToken, (req, res) => {
+  let { nome, idade, peso, raca } = req.body;
+  const clienteId = req.user.id;
+
+  console.log('Dados recebidos para cadastro de pet:', { nome, idade, peso, raca, clienteId });
+
+  if (!clienteId) {
+    console.error('Erro: ID do cliente não encontrado no token.');
+    return res.status(400).json({ error: 'ID do cliente não encontrado!' });
+  }
+
+  // Validar e formatar o peso
+  if (typeof peso === 'string') {
+    peso = parseFloat(peso.replace(',', '.'));
+  } else if (typeof peso === 'number') {
+    peso = parseFloat(peso.toString());
+  } else {
+    console.error('Erro: Peso inválido.');
+    return res.status(400).json({ error: 'Peso inválido!' });
+  }
+
+  console.log('Peso formatado:', peso);
+
+  const sql = `
+    INSERT INTO Pet (Nome_Pet, Idade, Peso, Raca, fk_Cliente__ID_Cliente)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const values = [nome, idade, peso, raca, clienteId];
+
+  console.log('Valores para inserção no banco de dados:', values);
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      if (err.code === 'ER_NO_REFERENCED_ROW' || err.code === 'ER_NO_REFERENCED_ROW_2') {
+        console.error('Erro: Cliente não encontrado no banco de dados.');
+        return res.status(400).json({ error: 'Cliente não encontrado!' });
+      }
+      console.error('Erro ao cadastrar pet no banco de dados:', err);
+      return res.status(500).json({ error: 'Erro ao cadastrar pet!' });
+    }
+    console.log('Pet cadastrado com sucesso:', result);
+    res.status(200).json({ message: 'Pet cadastrado com sucesso!' });
+  });
+});
+
+app.get('/api/meus-pets', authenticateToken, (req, res) => {
+  const clienteId = req.user.id;
+
+  const sql = `SELECT ID_Pet AS id, Nome_Pet AS nome, Idade AS idade, Peso AS peso, Raca AS raca FROM Pet WHERE fk_Cliente__ID_Cliente = ?`;
+  db.query(sql, [clienteId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar pets do usuário:', err);
+      return res.status(500).json({ error: 'Erro ao buscar pets!' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+app.delete('/api/pet/:id', authenticateToken, (req, res) => {
+  const petId = req.params.id;
+  const clienteId = req.user.id;
+
+  const sql = `DELETE FROM Pet WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
+  db.query(sql, [petId, clienteId], (err, result) => {
+    if (err) {
+      console.error('Erro ao excluir pet:', err);
+      return res.status(500).json({ error: 'Erro ao excluir pet!' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pet não encontrado!' });
+    }
+
+    res.status(200).json({ message: 'Pet excluído com sucesso!' });
   });
 });
 

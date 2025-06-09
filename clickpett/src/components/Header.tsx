@@ -61,7 +61,8 @@ const Header: React.FC = () => {
               {menuAberto && (
                 <div className="dropdown-menu">
                   <Link to="/editar-conta" className="dropdown-item">Editar Conta</Link>
-                  <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link>
+                  <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link> 
+                  <Link to="/meus-pets" className="dropdown-item">Meus Pets</Link> 
                   <button className="dropdown-item logout-btn" onClick={handleLogout}>Sair</button>
                 </div>
               )}

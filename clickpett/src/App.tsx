@@ -9,6 +9,8 @@ import Servicos from './pages/servicos';
 import ReservaServico from './pages/reserva';
 import FAQPage from './pages/faq'; 
 import EditarConta from './pages/editarConta';
+import CadastrarPet from './pages/cadastroPet';
+import MeusPets from './pages/MeusPets';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path="/reserva" element={<ReservaServico />} />
         <Route path="/faq" element={<FAQPage />} /> 
         <Route path="/editar-conta" element={<EditarConta />} />
+        <Route path="/cadastrar-pet" element={<CadastrarPet />} />
+        <Route path="/meus-pets" element={<MeusPets />} />
       </Routes>
     </Router>
   );
