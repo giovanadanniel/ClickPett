@@ -642,6 +642,27 @@ app.delete('/api/agendamento/:id', authenticateToken, (req, res) => {
   });
 });
 
+app.post('/api/verificar-email', (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'E-mail não fornecido!' });
+  }
+
+  db.query('SELECT 1 FROM Cliente WHERE E_mail = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar e-mail:', err);
+      return res.status(500).json({ error: 'Erro ao verificar e-mail!' });
+    }
+
+    if (results.length > 0) {
+      return res.json({ existe: true });
+    }
+
+    res.json({ existe: false });
+  });
+});
+
 // Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
