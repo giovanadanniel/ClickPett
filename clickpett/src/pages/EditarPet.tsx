@@ -80,11 +80,23 @@ const EditarPet: React.FC = () => {
   const nascimento = new Date(dataNascimento);
   const hoje = new Date();
   const diffTime = hoje.getTime() - nascimento.getTime();
+   const anoAtual = hoje.getFullYear();
 
   if (diffTime < 0) {
     return Swal.fire({
       title: 'Erro',
       text: 'A data de nascimento não pode ser no futuro!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação: Ano entre 2000 e o ano atual
+  if (nascimento.getFullYear() < 2000 || nascimento.getFullYear() > anoAtual) {
+    return Swal.fire({
+      title: 'Erro',
+      text: `O ano da data de nascimento deve estar entre 2000 e ${anoAtual}!`,
       icon: 'error',
       background: '#fff',
       color: '#000',
