@@ -14,6 +14,7 @@ import MeusPets from './pages/MeusPets';
 import EditarPet from './pages/EditarPet';
 import CadastroServico from './pages/CadastroServico';
 import MeusServicos from './pages/MeusServicos';
+import EditarServico from './pages/EditarServico';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/editar-pet/:id" element={<EditarPet />} />
         <Route path="/cadastrar-servico" element={<CadastroServico />} />
         <Route path="/meus-servicos" element={<MeusServicos />} />
+        <Route path="/editar-servico/:id" element={<EditarServico />} />
       </Routes>
     </Router>
   );

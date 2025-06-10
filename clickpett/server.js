@@ -3,9 +3,11 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 5000; // Porta do servidor
+const SECRET_KEY = 'sua_chave_secreta'; // Substitua por uma chave secreta segura
 
 // Middleware
 app.use(cors());
@@ -27,6 +29,14 @@ db.connect((err) => {
   }
   console.log('Conectado ao banco de dados!');
 });
+
+// Configuração do CORS
+const corsOptions = {
+  origin: '*', // Permitir todas as origens
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 // Rota para cadastro
 app.post('/api/cadastro', async (req, res) => {
@@ -80,9 +90,6 @@ app.post('/api/cadastro', async (req, res) => {
   });
 });
 
-const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'sua_chave_secreta'; // Substitua por uma chave secreta segura
-
 app.post('/api/login', async (req, res) => {
   const { email, senha } = req.body;
 
@@ -116,13 +123,6 @@ app.post('/api/login', async (req, res) => {
         token,
         user: { id: user.ID_Cliente, nome: user.Nome_Cliente, papel: user.Papel },
       });
-
-      res.status(200).json({
-        message: 'Login realizado com sucesso!',
-        token,
-        user: { id: user.ID_Cliente, nome: user.Nome_Cliente, papel: user.Papel },
-      });
-
     });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao processar login!' });
@@ -411,6 +411,77 @@ app.get('/api/cadastro', (req, res) => {
       return res.json({ exists: true });
     }
     res.json({ exists: false });
+  });
+});
+
+// Adição de logs detalhados
+app.use((req, res, next) => {
+  console.log(`Requisição recebida: ${req.method} ${req.url}`);
+  next();
+});
+
+// Rota para excluir um serviço
+app.delete('/api/servico/:id', authenticateToken, (req, res) => {
+  const servicoId = req.params.id;
+
+  console.log(`Tentativa de exclusão: Serviço ID = ${servicoId}`); // Log para depuração
+
+  const sql = `DELETE FROM Servicos WHERE ID_Servicos = ?`;
+  db.query(sql, [servicoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao excluir serviço:', err);
+      return res.status(500).json({ error: 'Erro ao excluir serviço!' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Serviço não encontrado!' });
+    }
+
+    res.status(200).json({ message: 'Serviço excluído com sucesso!' });
+  });
+});
+
+// Rota para buscar os dados de um serviço pelo ID
+app.get('/api/servico/:id', authenticateToken, (req, res) => {
+  const servicoId = req.params.id;
+
+  console.log(`Buscando informações do serviço: Serviço ID = ${servicoId}`); // Log para depuração
+
+  const sql = `SELECT ID_Servicos AS id, Nome_Servico AS nome, Preco_Servico AS preco 
+               FROM Servicos WHERE ID_Servicos = ?`;
+  db.query(sql, [servicoId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar informações do serviço:', err);
+      return res.status(500).json({ error: 'Erro ao buscar informações do serviço!' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Serviço não encontrado!' });
+    }
+
+    res.status(200).json(results[0]);
+  });
+});
+
+// Rota para editar um serviço
+app.put('/api/servico/:id', authenticateToken, (req, res) => {
+  const servicoId = req.params.id;
+  const { nomeServico, precoServico } = req.body;
+
+  console.log(`Tentativa de edição: Serviço ID = ${servicoId}`); // Log para depuração
+
+  const sql = `UPDATE Servicos SET Nome_Servico = ?, Preco_Servico = ? WHERE ID_Servicos = ?`;
+  db.query(sql, [nomeServico, precoServico, servicoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao editar serviço:', err);
+      return res.status(500).json({ error: 'Erro ao editar serviço!' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Serviço não encontrado!' });
+    }
+
+    res.status(200).json({ message: 'Serviço atualizado com sucesso!' });
   });
 });
 

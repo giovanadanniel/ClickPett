@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Swal from 'sweetalert2';
 import './style.css';
 
 interface Servico {
@@ -12,6 +14,7 @@ interface Servico {
 const MeusServicos: React.FC = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,6 +53,44 @@ const MeusServicos: React.FC = () => {
         });
     }, []);
 
+  const handleEditar = (id: number) => {
+    navigate(`/editar-servico/${id}`);
+  };
+
+  const handleExcluir = (id: number) => {
+    Swal.fire({
+      title: 'Tem certeza de que deseja excluir este serviço?',
+      text: 'Esta ação não pode ser desfeita!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim, excluir!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost:5000/api/servico/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              setServicos((prevServicos) => prevServicos.filter((servico) => servico.id !== id));
+              Swal.fire('Excluído!', 'O serviço foi excluído com sucesso.', 'success');
+            } else {
+              Swal.fire('Erro!', 'Erro ao excluir o serviço.', 'error');
+            }
+          })
+          .catch((error) => {
+            console.error('Erro ao excluir serviço:', error);
+            Swal.fire('Erro!', 'Erro ao excluir o serviço.', 'error');
+          });
+      }
+    });
+  };
+
   return (
     <>
       <Header />
@@ -63,6 +104,10 @@ const MeusServicos: React.FC = () => {
               <div key={servico.id} className="servico-card">
                 <h2>{servico.nome}</h2>
                 <p>Preço: R$ {servico.preco.toFixed(2)}</p>
+                <div className="servico-actions">
+                  <button onClick={() => handleEditar(servico.id)}>Editar</button>
+                  <button onClick={() => handleExcluir(servico.id)}>Excluir</button>
+                </div>
               </div>
             ))}
           </div>
