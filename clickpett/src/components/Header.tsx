@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Adicionado useNavigate
 import '../pages/style.css';
 
 const Header: React.FC = () => {
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
-  const [papelUsuario, setPapelUsuario] = useState<number | null>(null); // Estado para armazenar o papel do usuário
-  const [menuAberto, setMenuAberto] = useState(false); // Estado para controlar o menu
+  const [papelUsuario, setPapelUsuario] = useState<number | null>(null);
+  const [menuAberto, setMenuAberto] = useState(false);
+  const navigate = useNavigate(); // Inicializar useNavigate
 
   useEffect(() => {
-    // Recuperar o nome e papel do usuário do localStorage
     const nome = localStorage.getItem('nomeUsuario');
-    const papel = localStorage.getItem('papelUsuario'); // Recupera o papel do usuário
+    const papel = localStorage.getItem('papelUsuario');
     setNomeUsuario(nome);
     setPapelUsuario(papel ? parseInt(papel, 10) : null);
 
-    // Adicionar um listener para mudanças no localStorage
     const handleStorageChange = () => {
       const updatedNome = localStorage.getItem('nomeUsuario');
       const updatedPapel = localStorage.getItem('papelUsuario');
@@ -30,17 +29,16 @@ const Header: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    // Remover o nome e papel do usuário do localStorage
     localStorage.removeItem('nomeUsuario');
     localStorage.removeItem('papelUsuario');
-    localStorage.removeItem('token'); // Remover o token também
-    setNomeUsuario(null); // Atualizar o estado para refletir o logout
+    localStorage.removeItem('token');
+    setNomeUsuario(null);
     setPapelUsuario(null);
-    window.location.reload(); // Recarregar a página para atualizar o estado
+    navigate('/'); // Redirecionar para a página inicial
   };
 
   const toggleMenu = () => {
-    setMenuAberto(!menuAberto); // Alternar a visibilidade do menu
+    setMenuAberto(!menuAberto);
   };
 
   return (
@@ -72,14 +70,14 @@ const Header: React.FC = () => {
                       <Link to="/editar-conta" className="dropdown-item">Editar Usuário</Link>
                       <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link>
                       <Link to="/meus-pets" className="dropdown-item">Meus Pets</Link>
-                      <Link to="/meus-agendamentos" className="dropdown-item">Meus Agendamentos</Link> {/* Novo link */}
+                      <Link to="/meus-agendamentos" className="dropdown-item">Meus Agendamentos</Link>
                     </>
                   )}
                   {papelUsuario === 2 && (
                     <>
                       <Link to="/editar-conta" className="dropdown-item">Editar Usuário</Link>
                       <Link to="/cadastrar-servico" className="dropdown-item">Cadastrar Serviço</Link>
-                      <Link to="/meus-servicos" className="dropdown-item">Meus Serviços</Link> {/* Adicionado */}
+                      <Link to="/meus-servicos" className="dropdown-item">Meus Serviços</Link>
                     </>
                   )}
                   <button className="dropdown-item logout-btn" onClick={handleLogout}>Sair</button>

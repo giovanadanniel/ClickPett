@@ -51,42 +51,50 @@ app.post('/api/cadastro', async (req, res) => {
     return res.status(400).json({ error: 'CPF deve conter exatamente 11 dígitos numéricos.' });
   }
 
-  // Verificar se o CPF já existe
-  db.query('SELECT 1 FROM Cliente WHERE CPF = ?', [cpfSemFormatacao], async (err, results) => {
+  // Verificar se o e-mail já existe
+  db.query('SELECT 1 FROM Cliente WHERE E_mail = ?', [email], async (err, results) => {
     if (err) {
-      console.error('Erro ao verificar CPF:', err);
+      console.error('Erro ao verificar e-mail:', err);
       return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
     }
     if (results.length > 0) {
-      return res.status(400).json({ error: 'CPF JÁ EXISTE' });
+      return res.status(400).json({ error: 'E-mail já cadastrado!' });
     }
 
-    try {
-      // Criptografar a senha
-      const saltRounds = 10;
-      const hashedSenha = await bcrypt.hash(senha, saltRounds);
+    // Verificar se o CPF já existe
+    db.query('SELECT 1 FROM Cliente WHERE CPF = ?', [cpfSemFormatacao], async (err, results) => {
+      if (err) {
+        console.error('Erro ao verificar CPF:', err);
+        return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+      }
+      if (results.length > 0) {
+        return res.status(400).json({ error: 'CPF já cadastrado!' });
+      }
 
-      // Inserir no banco de dados
-      const sql = `
-        INSERT INTO Cliente (Nome_Cliente, E_mail, CPF, Telefone, Senha, Papel)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
-      const values = [nome, email, cpfSemFormatacao, telefoneSemFormatacao, hashedSenha, 1]; // Papel = 1 (exemplo)
+      try {
+        // Criptografar a senha
+        const saltRounds = 10;
+        const hashedSenha = await bcrypt.hash(senha, saltRounds);
 
-      db.query(sql, values, (err, result) => {
-        if (err) {
-          if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(400).json({ error: 'CPF JÁ EXISTE' });
+        // Inserir no banco de dados
+        const sql = `
+          INSERT INTO Cliente (Nome_Cliente, E_mail, CPF, Telefone, Senha, Papel)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        const values = [nome, email, cpfSemFormatacao, telefoneSemFormatacao, hashedSenha, 1]; // Papel = 1 (exemplo)
+
+        db.query(sql, values, (err, result) => {
+          if (err) {
+            console.error('Erro ao inserir no banco de dados:', err);
+            return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
           }
-          console.error('Erro ao inserir no banco de dados:', err);
-          return res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
-        }
-        res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
-      });
-    } catch (err) {
-      console.error('Erro ao criptografar a senha:', err);
-      res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
-    }
+          res.status(200).json({ message: 'Cadastro realizado com sucesso!' });
+        });
+      } catch (err) {
+        console.error('Erro ao criptografar a senha:', err);
+        res.status(500).json({ error: 'Erro ao cadastrar cliente!' });
+      }
+    });
   });
 });
 
@@ -147,9 +155,22 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ error: 'Token inválido!' });
     }
 
-    console.log('Token validado com sucesso:', user); // Log para depuração
-    req.user = user;
-    next();
+    // Verificar se o usuário ainda existe no banco de dados
+    const sql = `SELECT ID_Cliente FROM Cliente WHERE ID_Cliente = ?`;
+    db.query(sql, [user.id], (dbErr, results) => {
+      if (dbErr) {
+        console.error('Erro ao verificar existência do usuário:', dbErr);
+        return res.status(500).json({ error: 'Erro interno do servidor!' });
+      }
+
+      if (results.length === 0) {
+        console.warn(`Usuário com ID ${user.id} não encontrado no banco de dados.`);
+        return res.status(401).json({ error: 'Acesso negado! Usuário não encontrado.' });
+      }
+
+      req.user = user; // Adicionar os dados do usuário à requisição
+      next();
+    });
   });
 };
 

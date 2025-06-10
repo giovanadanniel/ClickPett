@@ -139,7 +139,9 @@ export default function EditarConta() {
     };
 
 const handleDeleteAccount = async () => {
-  const token = localStorage.getItem('token'); // Recuperar o token do usuário logado
+  const token = localStorage.getItem('token');
+  localStorage.removeItem('nomeUsuario');
+  localStorage.removeItem('papelUsuario'); 
 
   // Exibir confirmação antes de excluir a conta
   const result = await Swal.fire({

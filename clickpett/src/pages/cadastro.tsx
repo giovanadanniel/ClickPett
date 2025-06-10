@@ -124,57 +124,128 @@ export default function Cadastro() {
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const { nome, email, telefone, cpf, senha, confirmarSenha } = form;
+  e.preventDefault();
+  const { nome, email, telefone, cpf, senha, confirmarSenha } = form;
 
-    if (!nome.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Nome é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    if (!telefone.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Telefone é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    if (!cpf.trim()) return Swal.fire({ title: 'Erro', text: 'O campo CPF é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
+  // Validação de nome: mínimo 3 letras
+  if (nome.trim().length < 3) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O nome deve ter no mínimo 3 letras!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return Swal.fire({ title: 'Erro', text: 'Digite um email válido!', icon: 'error', background: '#121212', color: '#fff' });
+  // Validação de e-mail
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'Digite um e-mail válido!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
 
-    if (checkPasswordStrength(senha) < 3) return Swal.fire({ title: 'Erro', text: 'A senha deve atender a pelo menos 3 dos 4 critérios de força!', icon: 'error', background: '#121212', color: '#fff' });
-    if (senha !== confirmarSenha) return Swal.fire({ title: 'Erro', text: 'As senhas não coincidem!', icon: 'error', background: '#121212', color: '#fff' });
+  // Validação de telefone
+  if (!telefone.trim()) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Telefone é obrigatório!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
 
-    // Validação de CPF
-    if (!validarCPF(cpf)) {
-      return Swal.fire({ title: 'Erro', text: 'Digite um CPF válido!', icon: 'error', background: '#121212', color: '#fff' });
+  // Validação de CPF
+  if (!cpf.trim()) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo CPF é obrigatório!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  if (!validarCPF(cpf)) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'Digite um CPF válido!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+// Validação de senha: deve atender os 3 critérios
+const senhaForte =
+  senha.length >= 8 &&
+  /\d/.test(senha) &&
+  /[!@#$%^&*(),.?":{}|<>]/.test(senha);
+
+if (!senhaForte) {
+  return Swal.fire({
+    title: 'Erro',
+    text: 'A senha deve atender todos os 3 critérios: mínimo 8 caracteres, conter número e caractere especial!',
+    icon: 'error',
+    background: '#fff',
+    color: '#000',
+  });
+}
+
+  // Validação de confirmação de senha
+  if (senha !== confirmarSenha) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'As senhas não coincidem!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  const telefoneSemFormatacao = telefone.replace(/\D/g, '');
+  const cpfSemFormatacao = cpf.replace(/\D/g, '');
+
+  try {
+    // Verifica se o CPF ou e-mail já existe antes de cadastrar
+    const response = await fetch('http://localhost:5000/api/cadastro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, telefone: telefoneSemFormatacao, cpf: cpfSemFormatacao, senha }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao cadastrar cliente!');
     }
 
-    const telefoneSemFormatacao = telefone.replace(/\D/g, '');
-    const cpfSemFormatacao = cpf.replace(/\D/g, '');
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Cadastro realizado com sucesso!',
+      icon: 'success',
+      background: '#fff',
+      color: '#000',
+    }).then(() => {
+      window.location.href = '/login';
+    });
 
-    try {
-      // Verifica se o CPF já existe antes de cadastrar
-      const checkCpf = await fetch(`http://localhost:5000/api/cadastro?cpf=${cpfSemFormatacao}`);
-      if (checkCpf.ok) {
-        const exists = await checkCpf.json();
-        if (exists.exists) {
-          return Swal.fire({ title: 'Erro', text: 'Este CPF já está cadastrado!', icon: 'error', background: '#121212', color: '#fff' });
-        }
-      }
-
-      const response = await fetch('http://localhost:5000/api/cadastro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, telefone: telefoneSemFormatacao, cpf: cpfSemFormatacao, senha }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao cadastrar cliente!');
-      }
-
-      Swal.fire({ title: 'Sucesso!', text: 'Cadastro realizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' })
-        .then(() => {
-          window.location.href = '/login';
-        });
-      setForm({ nome: '', email: '', telefone: '', cpf: '', senha: '', confirmarSenha: '' });
-    } catch (error: any) {
-      Swal.fire({ title: 'Erro', text: error.message, icon: 'error', background: '#121212', color: '#fff' });
-    }
-  };
+    setForm({ nome: '', email: '', telefone: '', cpf: '', senha: '', confirmarSenha: '' });
+  } catch (error: any) {
+    Swal.fire({
+      title: 'Erro',
+      text: error.message,
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+};
 
   return (
     <>
