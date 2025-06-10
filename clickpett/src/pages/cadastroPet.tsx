@@ -31,10 +31,49 @@ export default function CadastrarPet() {
     e.preventDefault();
     const { nome, idade, peso, raca } = form;
 
-    if (!nome.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Nome é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    if (!idade.trim() || isNaN(Number(idade))) return Swal.fire({ title: 'Erro', text: 'O campo Idade deve ser um número válido!', icon: 'error', background: '#121212', color: '#fff' });
-    if (!peso.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Peso é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    if (!raca.trim()) return Swal.fire({ title: 'Erro', text: 'O campo Raça é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
+    // Validação do campo Nome
+    if (!nome.trim() || nome.trim().length < 3) {
+        return Swal.fire({ 
+            title: 'Erro', 
+            text: 'O campo Nome deve ter no mínimo 3 letras!', 
+            icon: 'error', 
+            background: '#fff', 
+            color: '#000' 
+        });
+    }
+
+    // Validação do campo Idade
+    if (!idade.trim() || isNaN(Number(idade)) || Number(idade) < 0 || idade.includes('.') || idade.includes(',')) {
+        return Swal.fire({ 
+            title: 'Erro', 
+            text: 'O campo Idade deve ser um número válido e não pode ser negativo ou conter "." ou ","!', 
+            icon: 'error', 
+            background: '#fff', 
+            color: '#000' 
+        });
+    }
+
+    // Validação do campo Peso
+    if (!peso.trim() || isNaN(Number(peso)) || Number(peso) < 0 || !/^\d+(\.\d{1,3})?$/.test(peso.replace(',', '.'))) {
+        return Swal.fire({ 
+            title: 'Erro', 
+            text: 'O campo Peso deve ser um número válido, não pode ser negativo e deve ter no máximo 3 casas decimais!', 
+            icon: 'error', 
+            background: '#fff', 
+            color: '#000' 
+        });
+    }
+
+    // Validação do campo Raça
+    if (!raca.trim() || raca.trim().length < 3) {
+        return Swal.fire({ 
+            title: 'Erro', 
+            text: 'O campo Raça deve ter no mínimo 3 letras!', 
+            icon: 'error', 
+            background: '#fff', 
+            color: '#000' 
+        });
+    }
 
     try {
         const token = localStorage.getItem('token');
@@ -43,27 +82,39 @@ export default function CadastrarPet() {
         const pesoFormatado = peso.replace(',', '.');
 
         const response = await fetch('http://localhost:5000/api/cadastrar-pet', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ nome, idade: Number(idade), peso: parseFloat(pesoFormatado), raca }),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ nome, idade: Number(idade), peso: parseFloat(pesoFormatado), raca }),
         });
 
         if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao cadastrar pet!');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao cadastrar pet!');
         }
 
-        Swal.fire({ title: 'Sucesso!', text: 'Pet cadastrado com sucesso!', icon: 'success', background: '#121212', color: '#fff' });
+        Swal.fire({ 
+            title: 'Sucesso!', 
+            text: 'Pet cadastrado com sucesso!', 
+            icon: 'success', 
+            background: '#fff', 
+            color: '#000' 
+        });
         setForm({ nome: '', idade: '', peso: '', raca: '' });
 
-        navigate('/'); // Redirecionar para a página inicial
+        navigate('/meus-pets'); // Redirecionar para a página inicial
     } catch (error: any) {
-        Swal.fire({ title: 'Erro', text: error.message, icon: 'error', background: '#121212', color: '#fff' });
+        Swal.fire({ 
+            title: 'Erro', 
+            text: error.message, 
+            icon: 'error', 
+            background: '#fff', 
+            color: '#000' 
+        });
     }
- };
+};
 
   return (
     <>
