@@ -7,7 +7,7 @@ import './style.css';
 
 const EditarPet: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [form, setForm] = useState({ nome: '', idade: '', peso: '', raca: '' });
+  const [form, setForm] = useState({ nome: '', dataNascimento: '', peso: '', raca: '' });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,21 +15,33 @@ const EditarPet: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login');
+    return;
+  }
 
-    fetch(`http://localhost:5000/api/pet/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  fetch(`http://localhost:5000/api/pet/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Converter a data de nascimento para o formato DD/MM/YYYY
+      const dataNascimentoFormatada = new Date(data.dataNascimento)
+        .toISOString()
+        .split('T')[0]; // Mantém o formato YYYY-MM-DD para o campo de data
+
+      setForm({
+        nome: data.nome,
+        dataNascimento: dataNascimentoFormatada, // Formato ajustado para o campo de data
+        peso: data.peso,
+        raca: data.raca,
+      });
     })
-      .then((response) => response.json())
-      .then((data) => setForm(data))
-      .catch((error) => console.error('Erro ao buscar informações do pet:', error));
-  }, [id, navigate]);
+    .catch((error) => console.error('Erro ao buscar informações do pet:', error));
+}, [id, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -40,46 +52,115 @@ const EditarPet: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { nome, idade, peso, raca } = form;
+  e.preventDefault();
+  const { nome, dataNascimento, peso, raca } = form;
 
-    // Certifique-se de que os valores são strings antes de usar .trim()
-    if (!String(nome).trim()) {
-        return Swal.fire({ title: 'Erro', text: 'O campo Nome é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    }
-    if (!String(idade).trim() || isNaN(Number(idade))) {
-        return Swal.fire({ title: 'Erro', text: 'O campo Idade deve ser um número válido!', icon: 'error', background: '#121212', color: '#fff' });
-    }
-    if (!String(peso).trim()) {
-        return Swal.fire({ title: 'Erro', text: 'O campo Peso é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
-    }
-    if (!String(raca).trim()) {
-        return Swal.fire({ title: 'Erro', text: 'O campo Raça é obrigatório!', icon: 'error', background: '#121212', color: '#fff' });
+  // Validação do campo Nome
+  if (!nome || !nome.trim() || nome.trim().length < 3) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Nome deve ter no mínimo 3 letras!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação do campo Data de Nascimento
+  if (!dataNascimento || !dataNascimento.trim()) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Data de Nascimento é obrigatório!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  const nascimento = new Date(dataNascimento);
+  const hoje = new Date();
+  const diffTime = hoje.getTime() - nascimento.getTime();
+
+  if (diffTime < 0) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'A data de nascimento não pode ser no futuro!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  const diffDays = diffTime / (1000 * 3600 * 24);
+
+  let idade;
+  if (diffDays < 30) {
+    idade = `${Math.floor(diffDays)} dias`; // Menos de 1 mês, calcula em dias
+  } else if (diffDays < 365) {
+    idade = `${Math.floor(diffDays / 30)} meses`; // Menos de 1 ano, calcula em meses
+  } else {
+    idade = `${Math.floor(diffDays / 365)} anos`; // 1 ano ou mais, calcula em anos
+  }
+
+  // Validação do campo Peso
+  if (!peso || typeof peso !== 'string' || !peso.trim() || isNaN(Number(peso)) || Number(peso) < 0 || !/^\d+(\.\d{1,3})?$/.test(peso.replace(',', '.'))) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Peso deve ser um número válido, não pode ser negativo e deve ter no máximo 3 casas decimais!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação do campo Raça
+  if (!raca || !raca.trim() || raca.trim().length < 3) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Raça deve ter no mínimo 3 letras!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+
+    const pesoFormatado = peso.replace(',', '.');
+
+    const response = await fetch(`http://localhost:5000/api/pet/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nome, dataNascimento, idade, peso: parseFloat(pesoFormatado), raca }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao atualizar pet!');
     }
 
-    try {
-        const token = localStorage.getItem('token');
-
-        const response = await fetch(`http://localhost:5000/api/pet/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ nome, idade: Number(idade), peso: parseFloat(peso), raca }),
-        });
-
-        if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao atualizar pet!');
-        }
-
-        Swal.fire({ title: 'Sucesso!', text: 'Pet atualizado com sucesso!', icon: 'success', background: '#121212', color: '#fff' });
-        navigate('/meus-pets');
-    } catch (error: any) {
-        Swal.fire({ title: 'Erro', text: error.message, icon: 'error', background: '#121212', color: '#fff' });
-    }
-    };
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Pet atualizado com sucesso!',
+      icon: 'success',
+      background: '#fff',
+      color: '#000',
+    });
+    navigate('/meus-pets');
+  } catch (error: any) {
+    Swal.fire({
+      title: 'Erro',
+      text: error.message,
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+};
 
   return (
     <>
@@ -94,8 +175,14 @@ const EditarPet: React.FC = () => {
                 <input type="text" id="nome" value={form.nome} onChange={handleChange} placeholder="Digite o nome do pet" />
               </div>
               <div className="form-group">
-                <label htmlFor="idade">Idade</label>
-                <input type="number" id="idade" value={form.idade} onChange={handleChange} placeholder="Digite a idade do pet" />
+                <label htmlFor="dataNascimento">Data de Nascimento</label>
+                <input
+                  type="date"
+                  id="dataNascimento"
+                  value={form.dataNascimento}
+                  onChange={handleChange}
+                  placeholder="Digite a data de nascimento do pet"
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="peso">Peso (kg)</label>

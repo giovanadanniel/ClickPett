@@ -222,46 +222,42 @@ app.delete('/api/usuario', authenticateToken, (req, res) => {
 });
 
 app.post('/api/cadastrar-pet', authenticateToken, (req, res) => {
-  let { nome, idade, peso, raca } = req.body;
+  const { nome, dataNascimento, peso, raca } = req.body;
   const clienteId = req.user.id;
 
-  console.log('Dados recebidos para cadastro de pet:', { nome, idade, peso, raca, clienteId });
-
-  if (!clienteId) {
-    console.error('Erro: ID do cliente não encontrado no token.');
-    return res.status(400).json({ error: 'ID do cliente não encontrado!' });
+  if (!nome || !dataNascimento || !peso || !raca) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios!' });
   }
 
-  // Validar e formatar o peso
-  if (typeof peso === 'string') {
-    peso = parseFloat(peso.replace(',', '.'));
-  } else if (typeof peso === 'number') {
-    peso = parseFloat(peso.toString());
+  const nascimento = new Date(dataNascimento);
+  const hoje = new Date();
+  const diffTime = hoje.getTime() - nascimento.getTime();
+
+  if (diffTime < 0) {
+    return res.status(400).json({ error: 'A data de nascimento não pode ser no futuro!' });
+  }
+
+  const diffDays = diffTime / (1000 * 3600 * 24);
+  let idade;
+  if (diffDays < 30) {
+    idade = `${Math.floor(diffDays)} dias`;
+  } else if (diffDays < 365) {
+    idade = `${Math.floor(diffDays / 30)} meses`;
   } else {
-    console.error('Erro: Peso inválido.');
-    return res.status(400).json({ error: 'Peso inválido!' });
+    idade = `${Math.floor(diffDays / 365)} anos`;
   }
-
-  console.log('Peso formatado:', peso);
 
   const sql = `
-    INSERT INTO Pet (Nome_Pet, Idade, Peso, Raca, fk_Cliente__ID_Cliente)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO Pet (Nome_Pet, Dt_Nasc, Idade, Peso, Raca, fk_Cliente__ID_Cliente)
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
-  const values = [nome, idade, peso, raca, clienteId];
-
-  console.log('Valores para inserção no banco de dados:', values);
+  const values = [nome, dataNascimento, idade, peso, raca, clienteId];
 
   db.query(sql, values, (err, result) => {
     if (err) {
-      if (err.code === 'ER_NO_REFERENCED_ROW' || err.code === 'ER_NO_REFERENCED_ROW_2') {
-        console.error('Erro: Cliente não encontrado no banco de dados.');
-        return res.status(400).json({ error: 'Cliente não encontrado!' });
-      }
       console.error('Erro ao cadastrar pet no banco de dados:', err);
       return res.status(500).json({ error: 'Erro ao cadastrar pet!' });
     }
-    console.log('Pet cadastrado com sucesso:', result);
     res.status(200).json({ message: 'Pet cadastrado com sucesso!' });
   });
 });
@@ -307,9 +303,7 @@ app.get('/api/pet/:id', authenticateToken, (req, res) => {
   const petId = req.params.id;
   const clienteId = req.user.id;
 
-  console.log(`Buscando informações do pet: Pet ID = ${petId}, Cliente ID = ${clienteId}`); // Log para depuração
-
-  const sql = `SELECT ID_Pet AS id, Nome_Pet AS nome, Idade AS idade, Peso AS peso, Raca AS raca 
+  const sql = `SELECT ID_Pet AS id, Nome_Pet AS nome, Dt_Nasc AS dataNascimento, Idade AS idade, Peso AS peso, Raca AS raca 
                FROM Pet WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
   db.query(sql, [petId, clienteId], (err, results) => {
     if (err) {
@@ -318,11 +312,9 @@ app.get('/api/pet/:id', authenticateToken, (req, res) => {
     }
 
     if (results.length === 0) {
-      console.warn(`Nenhum pet encontrado para o ID ${petId} associado ao cliente ${clienteId}`); // Log de aviso
       return res.status(404).json({ error: 'Pet não encontrado!' });
     }
 
-    console.log('Informações do pet encontradas:', results[0]); // Log dos dados retornados
     res.status(200).json(results[0]);
   });
 });
@@ -330,11 +322,33 @@ app.get('/api/pet/:id', authenticateToken, (req, res) => {
 app.put('/api/pet/:id', authenticateToken, (req, res) => {
   const petId = req.params.id;
   const clienteId = req.user.id;
-  const { nome, idade, peso, raca } = req.body;
+  const { nome, dataNascimento, peso, raca } = req.body;
 
-  const sql = `UPDATE Pet SET Nome_Pet = ?, Idade = ?, Peso = ?, Raca = ? 
+  if (!nome || !dataNascimento || !peso || !raca) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios!' });
+  }
+
+  const nascimento = new Date(dataNascimento);
+  const hoje = new Date();
+  const diffTime = hoje.getTime() - nascimento.getTime();
+
+  if (diffTime < 0) {
+    return res.status(400).json({ error: 'A data de nascimento não pode ser no futuro!' });
+  }
+
+  const diffDays = diffTime / (1000 * 3600 * 24);
+  let idade;
+  if (diffDays < 30) {
+    idade = `${Math.floor(diffDays)} dias`;
+  } else if (diffDays < 365) {
+    idade = `${Math.floor(diffDays / 30)} meses`;
+  } else {
+    idade = `${Math.floor(diffDays / 365)} anos`;
+  }
+
+  const sql = `UPDATE Pet SET Nome_Pet = ?, Dt_Nasc = ?, Idade = ?, Peso = ?, Raca = ? 
                WHERE ID_Pet = ? AND fk_Cliente__ID_Cliente = ?`;
-  db.query(sql, [nome, idade, peso, raca, petId, clienteId], (err, result) => {
+  db.query(sql, [nome, dataNascimento, idade, peso, raca, petId, clienteId], (err, result) => {
     if (err) {
       console.error('Erro ao atualizar informações do pet:', err);
       return res.status(500).json({ error: 'Erro ao atualizar informações do pet!' });

@@ -109,30 +109,37 @@ const MeusPets: React.FC = () => {
         alert('Erro ao excluir o pet.');
       });
   };
-    
-  return (
-    <>
-      <Header /> {/* Adiciona o Header */}
-      <div className="meus-pets-container">
-        <h1>Meus Pets</h1>
-        <div className="pets-list">
-          {pets.map((pet) => (
-            <div key={pet.id} className="pet-card">
-              <h2>{pet.nome}</h2>
-              <p>Idade: {pet.idade} anos</p>
-              <p>Peso: {pet.peso} kg</p>
-              <p>Raça: {pet.raca}</p>
-              <div className="pet-actions">
-                <button onClick={() => handleEditar(pet.id)}>Editar</button>
-                <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
-              </div>
+
+return (
+  <>
+    <Header /> {/* Adiciona o Header */}
+    <div className="meus-pets-container">
+      <h1>Meus Pets</h1>
+      <div className="pets-list">
+        {pets.map((pet) => (
+          <div key={pet.id} className="pet-card">
+            <h2>{pet.nome}</h2>
+            <p>Idade: {pet.idade}</p>
+            <p>
+              Peso: {pet.peso && !isNaN(Number(pet.peso)) 
+                ? (Number.isInteger(Number(pet.peso)) 
+                  ? Number(pet.peso) 
+                  : Number(pet.peso).toFixed(3).replace('.', ',')) 
+                : 'N/A'} kg
+            </p> {/* Exibe com até 3 números depois da vírgula */}
+            <p>Raça: {pet.raca}</p>
+            <div className="pet-actions">
+              <button onClick={() => handleEditar(pet.id)}>Editar</button>
+              <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-      <Footer /> {/* Adiciona o Footer */}
-    </>
-  );
+    </div>
+    <Footer /> {/* Adiciona o Footer */}
+  </>
+);
+
 };
 
 export default MeusPets;
