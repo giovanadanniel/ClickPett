@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Importar o Header
 import Footer from '../components/Footer'; // Importar o Footer
+import Swal from 'sweetalert2';
 import './style.css';
 
 interface Pet {
@@ -84,31 +85,60 @@ const MeusPets: React.FC = () => {
     navigate(`/editar-pet/${id}`);
   };
 
-  const handleExcluir = (id: number) => {
-    const confirmacao = window.confirm('Tem certeza de que deseja excluir este pet?');
-    if (!confirmacao) return;
+const handleExcluir = async (id: number) => {
+  const token = localStorage.getItem('token');
 
-    const token = localStorage.getItem('token');
-    fetch(`http://localhost:5000/api/pet/${id}`, { // Corrigido para incluir o host e a porta
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
-          alert('Pet excluído com sucesso!');
-        } else {
-          console.error('Erro ao excluir pet');
-          alert('Erro ao excluir o pet.');
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao excluir pet:', error);
-        alert('Erro ao excluir o pet.');
-      });
-  };
+  // Exibir confirmação antes de excluir
+  const confirmacao = await Swal.fire({
+    title: 'Confirmação',
+    text: 'Tem certeza que deseja excluir este pet?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33', // Cor do botão de confirmação
+    cancelButtonColor: '#3085d6', // Cor do botão de cancelamento
+    confirmButtonText: 'Sim, excluir!',
+    cancelButtonText: 'Cancelar',
+    background: '#fff', // Fundo branco
+    color: '#000', // Texto preto
+  });
+
+  if (!confirmacao.isConfirmed) {
+    return; // Cancelar exclusão
+  }
+
+  try {
+    const response = await fetch(`http://localhost:5000/api/pet/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao excluir pet!');
+    }
+
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Pet excluído com sucesso!',
+      icon: 'success',
+      background: '#fff', // Fundo branco
+      color: '#000', // Texto preto
+    });
+
+    // Atualizar a lista de pets após a exclusão
+    setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
+  } catch (error: any) {
+    Swal.fire({
+      title: 'Erro',
+      text: error.message,
+      icon: 'error',
+      background: '#fff', // Fundo branco
+      color: '#000', // Texto preto
+    });
+  }
+};
 
 return (
   <>
