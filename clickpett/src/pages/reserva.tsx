@@ -1,8 +1,19 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Link } from "react-router-dom";
 import './style.css';
+import axios from 'axios';
+
+// Definir tipos para os serviços e pets
+interface Servico {
+  id: number;
+  nome: string;
+}
+
+interface Pet {
+  id: number;
+  nome: string;
+}
 
 const ReservaServico = () => {
   const [formData, setFormData] = useState({
@@ -13,36 +24,53 @@ const ReservaServico = () => {
     observacoes: '',
   });
 
-  useEffect(() => {
-    document.title = 'Reserva - Click Pet';
-  }, []);
+  const [servicos, setServicos] = useState<Servico[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const servicoParam = params.get('servico');
-    if (servicoParam) {
-      setFormData((prev) => ({ ...prev, servico: servicoParam }));
-    }
-  }, []);
+  document.title = 'Reserva - Click Pet';
 
-  // Adicione o tipo ChangeEvent para eventos de input/select
+  // Buscar serviços do banco de dados
+  axios.get('http://localhost:5000/api/servicos', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
+    },
+  })
+    .then((response) => {
+      setServicos(response.data);
+    })
+    .catch((error) => {
+      console.error('Erro ao buscar serviços:', error);
+    });
+
+  // Buscar pets do usuário logado
+  axios.get('http://localhost:5000/api/meus-pets', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
+    },
+  })
+    .then((response) => {
+      setPets(response.data);
+    })
+    .catch((error) => {
+      console.error('Erro ao buscar pets:', error);
+    });
+}, []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Adicione o tipo FormEvent para eventos de formulário
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log('Reserva enviada:', formData);
     // Aqui você pode adicionar a lógica de envio para uma API, se quiser.
   };
 
-
   return (
     <>
-      
-      <Header /> {/* Usa o componente Header */}
+      <Header />
 
       <main className="reserva-container">
         <h1 className="title">Reserve um Serviço</h1>
@@ -56,21 +84,28 @@ const ReservaServico = () => {
             onChange={handleChange}
           >
             <option value="">Selecione...</option>
-            <option value="banho">Banho Completo</option>
-            <option value="tosa">Tosa Higiênica</option>
-            <option value="veterinario">Consulta Veterinária</option>
+            {servicos.map((servico) => (
+              <option key={servico.id} value={servico.nome}>
+                {servico.nome}
+              </option>
+            ))}
           </select>
 
           <label htmlFor="petNome">Nome do Pet:</label>
-          <input
-            type="text"
+          <select
             id="petNome"
             name="petNome"
             required
-            placeholder="Ex: Rex"
             value={formData.petNome}
             onChange={handleChange}
-          />
+          >
+            <option value="">Selecione...</option>
+            {pets.map((pet) => (
+              <option key={pet.id} value={pet.nome}>
+                {pet.nome}
+              </option>
+            ))}
+          </select>
 
           <label htmlFor="data">Data do Agendamento:</label>
           <input
@@ -106,8 +141,7 @@ const ReservaServico = () => {
         </form>
       </main>
 
-      <Footer /> {/* Usa o componente Footer */}
-      
+      <Footer />
     </>
   );
 };

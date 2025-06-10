@@ -485,6 +485,18 @@ app.put('/api/servico/:id', authenticateToken, (req, res) => {
   });
 });
 
+// Rota para buscar todos os serviços disponíveis
+app.get('/api/servicos', authenticateToken, (req, res) => {
+  const sql = `SELECT ID_Servicos AS id, Nome_Servico AS nome FROM Servicos`;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar serviços:', err);
+      return res.status(500).json({ error: 'Erro ao buscar serviços!' });
+    }
+    res.status(200).json(results);
+  });
+});
+
 // Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
