@@ -72,6 +72,7 @@ const Header: React.FC = () => {
                       <Link to="/editar-conta" className="dropdown-item">Editar Usuário</Link>
                       <Link to="/cadastrar-pet" className="dropdown-item">Cadastrar Pet</Link>
                       <Link to="/meus-pets" className="dropdown-item">Meus Pets</Link>
+                      <Link to="/meus-agendamentos" className="dropdown-item">Meus Agendamentos</Link> {/* Novo link */}
                     </>
                   )}
                   {papelUsuario === 2 && (

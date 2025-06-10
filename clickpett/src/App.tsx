@@ -15,6 +15,8 @@ import EditarPet from './pages/EditarPet';
 import CadastroServico from './pages/CadastroServico';
 import MeusServicos from './pages/MeusServicos';
 import EditarServico from './pages/EditarServico';
+import MeusAgendamentos from './pages/MeusAgendamentos';
+import EditarAgendamento from './pages/EditarAgendamento';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
         <Route path="/cadastrar-servico" element={<CadastroServico />} />
         <Route path="/meus-servicos" element={<MeusServicos />} />
         <Route path="/editar-servico/:id" element={<EditarServico />} />
+        <Route path="/meus-agendamentos" element={<MeusAgendamentos />} />
+        <Route path="/editar-agendamento/:id" element={<EditarAgendamento />} />
       </Routes>
     </Router>
   );

@@ -28,34 +28,34 @@ const ReservaServico = () => {
   const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
-  document.title = 'Reserva - Click Pet';
+    document.title = 'Reserva - Click Pet';
 
-  // Buscar serviços do banco de dados
-  axios.get('http://localhost:5000/api/servicos', {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
-    },
-  })
-    .then((response) => {
-      setServicos(response.data);
+    // Buscar serviços do banco de dados
+    axios.get('http://localhost:5000/api/servicos', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
+      },
     })
-    .catch((error) => {
-      console.error('Erro ao buscar serviços:', error);
-    });
+      .then((response) => {
+        setServicos(response.data);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar serviços:', error);
+      });
 
-  // Buscar pets do usuário logado
-  axios.get('http://localhost:5000/api/meus-pets', {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
-    },
-  })
-    .then((response) => {
-      setPets(response.data);
+    // Buscar pets do usuário logado
+    axios.get('http://localhost:5000/api/meus-pets', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
+      },
     })
-    .catch((error) => {
-      console.error('Erro ao buscar pets:', error);
-    });
-}, []);
+      .then((response) => {
+        setPets(response.data);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar pets:', error);
+      });
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -64,8 +64,29 @@ const ReservaServico = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Reserva enviada:', formData);
-    // Aqui você pode adicionar a lógica de envio para uma API, se quiser.
+
+    // Montar os dados para enviar ao backend
+    const agendamentoData = {
+      dataHora: `${formData.data} ${formData.hora}`, // Combinar data e hora
+      observacao: formData.observacoes,
+      servicoId: servicos.find((servico) => servico.nome === formData.servico)?.id, // Obter o ID do serviço
+      petId: pets.find((pet) => pet.nome === formData.petNome)?.id, // Obter o ID do pet
+    };
+
+    // Enviar os dados para o backend
+    axios.post('http://localhost:5000/api/agendamento', agendamentoData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`, // Adicione o token do usuário logado
+      },
+    })
+      .then((response) => {
+        console.log('Agendamento criado com sucesso:', response.data);
+        alert('Agendamento criado com sucesso!');
+      })
+      .catch((error) => {
+        console.error('Erro ao criar agendamento:', error);
+        alert('Erro ao criar agendamento!');
+      });
   };
 
   return (

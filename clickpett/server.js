@@ -497,6 +497,130 @@ app.get('/api/servicos', authenticateToken, (req, res) => {
   });
 });
 
+// Rota para criar um agendamento
+app.post('/api/agendamento', authenticateToken, (req, res) => {
+  const { dataHora, observacao, servicoId, petId } = req.body;
+
+  // Validar os dados recebidos
+  if (!dataHora || !servicoId || !petId) {
+    return res.status(400).json({ error: 'Data, serviço e pet são obrigatórios!' });
+  }
+
+  const sql = `
+    INSERT INTO Agendamento (Data_Hora, Observacao, fk_Servicos__ID_Servicos, fk_Pet_ID_Pet)
+    VALUES (?, ?, ?, ?)
+  `;
+  const values = [dataHora, observacao, servicoId, petId];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao criar agendamento:', err);
+      return res.status(500).json({ error: 'Erro ao criar agendamento!' });
+    }
+    res.status(200).json({ message: 'Agendamento criado com sucesso!' });
+  });
+});
+
+// Rota para buscar os agendamentos do usuário logado
+app.get('/api/meus-agendamentos', authenticateToken, (req, res) => {
+  const clienteId = req.user.id;
+
+  const sql = `
+    SELECT 
+      Agendamento.ID_Agendamento AS id,
+      Agendamento.Data_Hora AS dataHora,
+      Agendamento.Observacao AS observacao,
+      Servicos.Nome_Servico AS servico,
+      Pet.Nome_Pet AS pet
+    FROM Agendamento
+    INNER JOIN Servicos ON Agendamento.fk_Servicos__ID_Servicos = Servicos.ID_Servicos
+    INNER JOIN Pet ON Agendamento.fk_Pet_ID_Pet = Pet.ID_Pet
+    WHERE Pet.fk_Cliente__ID_Cliente = ?
+  `;
+
+  db.query(sql, [clienteId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar agendamentos:', err);
+      return res.status(500).json({ error: 'Erro ao buscar agendamentos!' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// Rota para buscar os dados de um agendamento pelo ID
+app.get('/api/agendamento/:id', authenticateToken, (req, res) => {
+  const agendamentoId = req.params.id;
+
+  const sql = `
+    SELECT 
+      Agendamento.ID_Agendamento AS id,
+      Agendamento.Data_Hora AS dataHora,
+      Agendamento.Observacao AS observacao,
+      Servicos.ID_Servicos AS servicoId,
+      Servicos.Nome_Servico AS servico,
+      Pet.ID_Pet AS petId,
+      Pet.Nome_Pet AS pet
+    FROM Agendamento
+    INNER JOIN Servicos ON Agendamento.fk_Servicos__ID_Servicos = Servicos.ID_Servicos
+    INNER JOIN Pet ON Agendamento.fk_Pet_ID_Pet = Pet.ID_Pet
+    WHERE Agendamento.ID_Agendamento = ?
+  `;
+
+  db.query(sql, [agendamentoId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar agendamento:', err);
+      return res.status(500).json({ error: 'Erro ao buscar agendamento!' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Agendamento não encontrado!' });
+    }
+
+    res.status(200).json(results[0]);
+  });
+});
+
+// Rota para atualizar os dados de um agendamento
+app.put('/api/agendamento/:id', authenticateToken, (req, res) => {
+  const agendamentoId = req.params.id;
+  const { dataHora, observacao, servicoId, petId } = req.body;
+
+  const sql = `
+    UPDATE Agendamento
+    SET Data_Hora = ?, Observacao = ?, fk_Servicos__ID_Servicos = ?, fk_Pet_ID_Pet = ?
+    WHERE ID_Agendamento = ?
+  `;
+
+  const values = [dataHora, observacao, servicoId, petId, agendamentoId];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar agendamento:', err);
+      return res.status(500).json({ error: 'Erro ao atualizar agendamento!' });
+    }
+
+    res.status(200).json({ message: 'Agendamento atualizado com sucesso!' });
+  });
+});
+
+app.delete('/api/agendamento/:id', authenticateToken, (req, res) => {
+  const agendamentoId = req.params.id;
+
+  const sql = `DELETE FROM Agendamento WHERE ID_Agendamento = ?`;
+  db.query(sql, [agendamentoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao excluir agendamento:', err);
+      return res.status(500).json({ error: 'Erro ao excluir agendamento!' });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Agendamento não encontrado!' });
+    }
+
+    res.status(200).json({ message: 'Agendamento excluído com sucesso!' });
+  });
+});
+
 // Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
