@@ -2,6 +2,7 @@ import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './style.css';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -35,37 +36,37 @@ const EditarAgendamento: React.FC = () => {
 
     // Buscar serviços do banco de dados
     axios.get('http://localhost:5000/api/servicos', {
-        headers: {
+      headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+      },
     })
-        .then((response) => {
+      .then((response) => {
         setServicos(response.data);
-        })
-        .catch((error) => {
+      })
+      .catch((error) => {
         console.error('Erro ao buscar serviços:', error);
-        });
+      });
 
     // Buscar pets do usuário logado
     axios.get('http://localhost:5000/api/meus-pets', {
-        headers: {
+      headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+      },
     })
-        .then((response) => {
+      .then((response) => {
         setPets(response.data);
-        })
-        .catch((error) => {
+      })
+      .catch((error) => {
         console.error('Erro ao buscar pets:', error);
-        });
+      });
 
     // Buscar dados do agendamento
     axios.get(`http://localhost:5000/api/agendamento/${id}`, {
-        headers: {
+      headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+      },
     })
-        .then((response) => {
+      .then((response) => {
         const { servicoId, petId, dataHora, observacao } = response.data;
 
         // Converter dataHora para os formatos esperados
@@ -74,25 +75,115 @@ const EditarAgendamento: React.FC = () => {
         const formattedTime = date.toTimeString().split(':').slice(0, 2).join(':'); // HH:mm
 
         setFormData({
-            servicoId: servicoId.toString(),
-            petId: petId.toString(),
-            data: formattedDate,
-            hora: formattedTime,
-            observacoes: observacao || '',
+          servicoId: servicoId.toString(),
+          petId: petId.toString(),
+          data: formattedDate,
+          hora: formattedTime,
+          observacoes: observacao || '',
         });
-        })
-        .catch((error) => {
+      })
+      .catch((error) => {
         console.error('Erro ao buscar agendamento:', error);
-        });
-    }, [id]);
+      });
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    const { data, hora, observacoes } = formData;
+
+    // Validação: Todos os campos devem estar preenchidos
+    if (!formData.servicoId || !formData.petId || !data || !hora || !observacoes.trim()) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'Todos os campos devem estar preenchidos!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    const hoje = new Date();
+    const hojeSemHoras = new Date();
+    hojeSemHoras.setHours(0, 0, 0, 0);
+
+    const dataSelecionada = new Date(data);
+
+    // Normalizar para UTC para evitar problemas de fuso horário
+    const hojeUTC = hojeSemHoras.toISOString().split('T')[0];
+    const dataSelecionadaUTC = dataSelecionada.toISOString().split('T')[0];
+
+    // Validação: Data não pode ser passada
+    if (dataSelecionadaUTC < hojeUTC) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'A data deve ser hoje ou futura!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    // Validação: Data pode ser no máximo um ano à frente
+    const umAnoDepois = new Date();
+    umAnoDepois.setFullYear(hoje.getFullYear() + 1);
+    const umAnoDepoisUTC = umAnoDepois.toISOString().split('T')[0];
+
+    if (dataSelecionadaUTC > umAnoDepoisUTC) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'A data não pode ser mais de um ano à frente!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    const horaSelecionada = parseInt(hora.split(':')[0], 10); // Obter a hora como número
+    const minutosSelecionados = parseInt(hora.split(':')[1], 10); // Obter os minutos como número
+
+    // Validação: Horário deve estar entre 8:00 e 20:00
+    if (horaSelecionada < 8 || horaSelecionada > 20 || (horaSelecionada === 20 && minutosSelecionados > 0)) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O horário deve estar entre 08:00 e 20:00!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    // Validação: Se a data for hoje, o horário não pode ter passado
+    if (dataSelecionadaUTC === hojeUTC) {
+      const horaAtual = hoje.getHours();
+      const minutosAtuais = hoje.getMinutes();
+
+      if (horaSelecionada < horaAtual || (horaSelecionada === horaAtual && minutosSelecionados < minutosAtuais)) {
+        return Swal.fire({
+          title: 'Erro',
+          text: 'O horário selecionado já passou!',
+          icon: 'error',
+          background: '#fff',
+          color: '#000',
+        });
+      }
+    }
+
+    // Validação: Observações devem ter no mínimo 3 letras
+    if (observacoes.trim().length < 3) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O campo Observações deve ter no mínimo 3 letras!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
 
     const agendamentoData = {
       dataHora: `${formData.data} ${formData.hora}`,
@@ -107,32 +198,69 @@ const EditarAgendamento: React.FC = () => {
       },
     })
       .then(() => {
-        alert('Agendamento atualizado com sucesso!');
+        Swal.fire({
+          title: 'Sucesso!',
+          text: 'Agendamento atualizado com sucesso!',
+          icon: 'success',
+          background: '#fff',
+          color: '#000',
+        });
         navigate('/meus-agendamentos');
       })
       .catch((error) => {
+        Swal.fire({
+          title: 'Erro',
+          text: 'Erro ao atualizar agendamento!',
+          icon: 'error',
+          background: '#fff',
+          color: '#000',
+        });
         console.error('Erro ao atualizar agendamento:', error);
-        alert('Erro ao atualizar agendamento!');
       });
   };
 
   const handleDelete = () => {
-  if (window.confirm('Tem certeza que deseja excluir este agendamento?')) {
-    axios.delete(`http://localhost:5000/api/agendamento/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then(() => {
-        alert('Agendamento excluído com sucesso!');
-        navigate('/meus-agendamentos');
-      })
-      .catch((error) => {
-        console.error('Erro ao excluir agendamento:', error);
-        alert('Erro ao excluir agendamento!');
-      });
-  }
-};
+    Swal.fire({
+      title: 'Confirmação',
+      text: 'Tem certeza que deseja excluir este agendamento?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar',
+      background: '#fff',
+      color: '#000',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(`http://localhost:5000/api/agendamento/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+          .then(() => {
+            Swal.fire({
+              title: 'Sucesso!',
+              text: 'Agendamento excluído com sucesso!',
+              icon: 'success',
+              background: '#fff',
+              color: '#000',
+            });
+            navigate('/meus-agendamentos');
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: 'Erro',
+              text: 'Erro ao excluir agendamento!',
+              icon: 'error',
+              background: '#fff',
+              color: '#000',
+            });
+            console.error('Erro ao excluir agendamento:', error);
+          });
+      }
+    });
+  };
 
   return (
     <>
@@ -203,6 +331,7 @@ const EditarAgendamento: React.FC = () => {
           />
 
           <button type="submit" className="btn-reserva">Atualizar Agendamento</button>
+
         </form>
       </main>
       <Footer />

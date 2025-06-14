@@ -66,55 +66,77 @@ export default function EditarServico() {
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    const { nomeServico, precoServico } = form;
+  e.preventDefault();
+  const { nomeServico, precoServico } = form;
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      Swal.fire({
-        title: 'Erro',
-        text: 'Token não encontrado! Faça login novamente.',
-        icon: 'error',
-        background: '#121212',
-        color: '#fff',
-      });
-      return;
+  // Validação do nome do serviço
+  if (nomeServico.trim().length < 3) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O nome do serviço deve ter no mínimo 3 caracteres.',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação do preço
+  const preco = parseFloat(precoServico);
+  if (isNaN(preco) || preco <= 0 || !/^\d+(\.\d{1,2})?$/.test(precoServico)) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O preço deve ser maior que 0 e pode ter no máximo 2 casas decimais.',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'Token não encontrado! Faça login novamente.',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  try {
+    const response = await fetch(`http://localhost:5000/api/servico/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nomeServico, precoServico: preco }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erro ao editar serviço!');
     }
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/servico/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ nomeServico, precoServico: parseFloat(precoServico) }),
-      });
+    Swal.fire({
+      title: 'Sucesso!',
+      text: 'Serviço atualizado com sucesso!',
+      icon: 'success',
+      background: '#fff',
+      color: '#000',
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao editar serviço!');
-      }
-
-      Swal.fire({
-        title: 'Sucesso!',
-        text: 'Serviço atualizado com sucesso!',
-        icon: 'success',
-        background: '#121212',
-        color: '#fff',
-      });
-
-      navigate('/meus-servicos');
-    } catch (error: any) {
-      Swal.fire({
-        title: 'Erro',
-        text: error.message,
-        icon: 'error',
-        background: '#121212',
-        color: '#fff',
-      });
-    }
-  };
+    navigate('/meus-servicos');
+  } catch (error: any) {
+    Swal.fire({
+      title: 'Erro',
+      text: error.message,
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+};
 
   return (
     <>

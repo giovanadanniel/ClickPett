@@ -3,6 +3,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './style.css';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import { useNavigate } from 'react-router-dom';
 
 interface Agendamento {
@@ -37,24 +39,36 @@ const MeusAgendamentos: React.FC = () => {
     navigate(`/editar-agendamento/${id}`);
   };
 
-  const handleExcluir = (id: number) => {
-    const confirmacao = window.confirm('Tem certeza de que deseja excluir este agendamento?');
-    if (!confirmacao) return;
-
-    axios.delete(`http://localhost:5000/api/agendamento/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    })
-      .then((response) => {
-        setAgendamentos((prevAgendamentos) => prevAgendamentos.filter((agendamento) => agendamento.id !== id));
-        alert('Agendamento excluído com sucesso!');
+const handleExcluir = (id: number) => {
+  Swal.fire({
+    title: 'Tem certeza?',
+    text: 'Você não poderá reverter esta ação!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sim, excluir!',
+    cancelButtonText: 'Cancelar',
+    background: '#fff', // Fundo branco
+    color: '#000', // Texto preto
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.delete(`http://localhost:5000/api/agendamento/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       })
-      .catch((error) => {
-        console.error('Erro ao excluir agendamento:', error);
-        alert('Erro ao excluir o agendamento.');
-      });
-  };
+        .then(() => {
+          setAgendamentos((prevAgendamentos) => prevAgendamentos.filter((agendamento) => agendamento.id !== id));
+          Swal.fire('Excluído!', 'O agendamento foi excluído com sucesso.', 'success');
+        })
+        .catch((error) => {
+          console.error('Erro ao excluir agendamento:', error);
+          Swal.fire('Erro!', 'Não foi possível excluir o agendamento.', 'error');
+        });
+    }
+  });
+};
 
   return (
     <>

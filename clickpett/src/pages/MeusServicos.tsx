@@ -103,7 +103,7 @@ const MeusServicos: React.FC = () => {
             {servicos.map((servico) => (
               <div key={servico.id} className="servico-card">
                 <h2>{servico.nome}</h2>
-                <p>Preço: R$ {servico.preco.toFixed(2)}</p>
+                <p>Preço: R$ {servico.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <div className="servico-actions">
                   <button onClick={() => handleEditar(servico.id)}>Editar</button>
                   <button onClick={() => handleExcluir(servico.id)}>Excluir</button>
