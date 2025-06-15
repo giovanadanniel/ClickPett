@@ -149,6 +149,17 @@ const AgendarServico = () => {
       return;
     }
 
+    // Validação: Observações não podem exceder 200 caracteres
+    if (observacoes.trim().length > 200) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O campo Observações não pode exceder 200 caracteres!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     try {
       const response = await axios.post(
         'http://localhost:5000/api/agendamento',

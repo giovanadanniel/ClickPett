@@ -44,6 +44,17 @@ export default function CadastroServico() {
       });
     }
 
+    // Validação: Nome do serviço não pode exceder 50 caracteres
+    if (nomeServico.trim().length > 50) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O nome do serviço não pode exceder 50 caracteres!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     // Validação do preço
     const preco = parseFloat(precoServico);
     if (isNaN(preco) || preco <= 0 || !/^\d+(\.\d{1,2})?$/.test(precoServico)) {

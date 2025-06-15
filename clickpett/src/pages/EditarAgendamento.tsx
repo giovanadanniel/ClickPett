@@ -234,6 +234,17 @@ const EditarAgendamento: React.FC = () => {
       });
     }
 
+    // Validação: Observações não podem exceder 200 caracteres
+    if (observacoes.trim().length > 200) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O campo Observações não pode exceder 200 caracteres!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     const agendamentoData = {
       dataHora: `${formData.data} ${formData.hora}`,
       observacao: formData.observacoes,

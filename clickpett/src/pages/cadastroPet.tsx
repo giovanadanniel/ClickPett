@@ -24,6 +24,7 @@ export default function CadastrarPet() {
     dataNascimento: '',
     peso: '',
     raca: '', // Novo campo
+    observacoes: '', // Novo campo para observações
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,13 +37,24 @@ export default function CadastrarPet() {
 
   const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
-  const { nome, dataNascimento, peso, raca } = form;
+  const { nome, dataNascimento, peso, raca, observacoes } = form;
 
   // Validação dos campos
   if (!nome.trim() || nome.trim().length < 3) {
     return Swal.fire({
       title: 'Erro',
       text: 'O campo Nome deve ter no mínimo 3 letras!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação: Nome não pode exceder 50 caracteres
+  if (nome.trim().length > 50) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Nome não pode exceder 50 caracteres!',
       icon: 'error',
       background: '#fff',
       color: '#000',
@@ -105,6 +117,28 @@ export default function CadastrarPet() {
     });
   }
 
+  // Validação: Raça não pode exceder 50 caracteres
+  if (raca.trim().length > 50) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Raça não pode exceder 50 caracteres!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
+  // Validação: Observações não podem exceder 200 caracteres
+  if (observacoes.trim().length > 200) {
+    return Swal.fire({
+      title: 'Erro',
+      text: 'O campo Observações não pode exceder 200 caracteres!',
+      icon: 'error',
+      background: '#fff',
+      color: '#000',
+    });
+  }
+
   try {
     const token = localStorage.getItem('token');
 
@@ -116,7 +150,7 @@ export default function CadastrarPet() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ nome, dataNascimento, peso: parseFloat(pesoFormatado), raca }),
+      body: JSON.stringify({ nome, dataNascimento, peso: parseFloat(pesoFormatado), raca, observacoes }),
     });
 
     if (!response.ok) {
@@ -131,7 +165,7 @@ export default function CadastrarPet() {
       background: '#fff',
       color: '#000',
     });
-    setForm({ nome: '', dataNascimento: '', peso: '', raca: '' });
+    setForm({ nome: '', dataNascimento: '', peso: '', raca: '', observacoes: '' });
 
     navigate('/meus-pets');
   } catch (error: any) {
@@ -174,6 +208,16 @@ export default function CadastrarPet() {
               <div className="form-group">
                 <label htmlFor="raca">Raça</label>
                 <input type="text" id="raca" value={form.raca} onChange={handleChange} placeholder="Digite a raça do pet" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="observacoes">Observações</label>
+                <input
+                  type="text"
+                  id="observacoes"
+                  value={form.observacoes}
+                  onChange={handleChange}
+                  placeholder="Digite observações sobre o pet (opcional)"
+                />
               </div>
               <button type="submit" className="register-btn">Cadastrar</button>
             </form>

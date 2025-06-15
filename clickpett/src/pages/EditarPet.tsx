@@ -75,6 +75,17 @@ const EditarPet: React.FC = () => {
       });
     }
 
+    // Validação: Nome não pode exceder 50 caracteres
+    if (nome.trim().length > 50) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O campo Nome não pode exceder 50 caracteres!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     // Validação do campo Data de Nascimento
     if (!dataNascimento || !dataNascimento.trim()) {
       return Swal.fire({
@@ -139,6 +150,17 @@ const EditarPet: React.FC = () => {
       return Swal.fire({
         title: 'Erro',
         text: 'O campo Raça deve ter no mínimo 3 letras!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    // Validação: Raça não pode exceder 50 caracteres
+    if (raca.trim().length > 50) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O campo Raça não pode exceder 50 caracteres!',
         icon: 'error',
         background: '#fff',
         color: '#000',
