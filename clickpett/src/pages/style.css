@@ -1332,12 +1332,13 @@ footer {
 
 /* Ajustar o container das caixinhas */
 .pets-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: flex-start; /* Alinha as caixinhas à esquerda */
-  margin-top: 20px;
-  padding-left: 20px; /* Adiciona um espaçamento à esquerda */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+  gap: 20px; /* Space between cards */
+  justify-content: center; /* Center align the grid */
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
 }
 
 /* Ajustar o estilo das caixinhas */
@@ -1425,10 +1426,10 @@ footer {
 
 /* Container da lista de pets */
 .pets-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 20px; /* Space between cards */
+    justify-content: center; /* Center align the grid */
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1450,12 +1451,13 @@ footer {
 
 /* Ajustar o container das caixinhas */
 .servicos-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: flex-start; /* Alinha as caixinhas à esquerda */
-  margin-top: 20px;
-  padding-left: 20px; /* Adiciona um espaçamento à esquerda */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+  gap: 20px; /* Space between cards */
+  justify-content: center; /* Center align the grid */
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
 }
 
 /* Ajustar o estilo das caixinhas */
@@ -1543,10 +1545,10 @@ footer {
 
 /* Container da lista de serviços */
 .servicos-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 20px; /* Space between cards */
+    justify-content: center; /* Center align the grid */
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1570,11 +1572,13 @@ footer {
 }
 
 .agendamentos-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: flex-start; 
-  margin-left: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+  gap: 20px; /* Space between cards */
+  justify-content: center; /* Center align the grid */
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
 }
 
 /* Estilos para os Cards de Agendamento */
@@ -1661,10 +1665,10 @@ footer {
 
 /* Container da lista de agendamentos */
 .agendamentos-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* Espaço entre os cards */
-    justify-content: center; /* Centralizar os cards */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 20px; /* Space between cards */
+    justify-content: center; /* Center align the grid */
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1690,12 +1694,13 @@ footer {
 .pets-list,
 .servicos-list,
 .agendamentos-list {
-    display: flex;
-    flex-wrap: wrap; /* Allow cards to wrap to the next line */
-    justify-content: flex-start; /* Align cards to the left */
-    gap: 15px; /* Add spacing between cards */
-    padding: 0;
-    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
+    gap: 20px; /* Space between cards */
+    justify-content: center; /* Center align the grid */
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
 }
 
 /* Ensure service cards match pet cards */
