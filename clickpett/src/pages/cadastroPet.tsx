@@ -24,7 +24,6 @@ export default function CadastrarPet() {
     dataNascimento: '',
     peso: '',
     raca: '', // Novo campo
-    observacoes: '', // Novo campo para observações
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +36,7 @@ export default function CadastrarPet() {
 
   const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
-  const { nome, dataNascimento, peso, raca, observacoes } = form;
+  const { nome, dataNascimento, peso, raca } = form;
 
   // Validação dos campos
   if (!nome.trim() || nome.trim().length < 3) {
@@ -128,17 +127,6 @@ export default function CadastrarPet() {
     });
   }
 
-  // Validação: Observações não podem exceder 200 caracteres
-  if (observacoes.trim().length > 200) {
-    return Swal.fire({
-      title: 'Erro',
-      text: 'O campo Observações não pode exceder 200 caracteres!',
-      icon: 'error',
-      background: '#fff',
-      color: '#000',
-    });
-  }
-
   try {
     const token = localStorage.getItem('token');
 
@@ -150,7 +138,7 @@ export default function CadastrarPet() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ nome, dataNascimento, peso: parseFloat(pesoFormatado), raca, observacoes }),
+      body: JSON.stringify({ nome, dataNascimento, peso: parseFloat(pesoFormatado), raca }),
     });
 
     if (!response.ok) {
@@ -165,7 +153,7 @@ export default function CadastrarPet() {
       background: '#fff',
       color: '#000',
     });
-    setForm({ nome: '', dataNascimento: '', peso: '', raca: '', observacoes: '' });
+    setForm({ nome: '', dataNascimento: '', peso: '', raca: '' });
 
     navigate('/meus-pets');
   } catch (error: any) {
@@ -209,16 +197,7 @@ export default function CadastrarPet() {
                 <label htmlFor="raca">Raça</label>
                 <input type="text" id="raca" value={form.raca} onChange={handleChange} placeholder="Digite a raça do pet" />
               </div>
-              <div className="form-group">
-                <label htmlFor="observacoes">Observações</label>
-                <input
-                  type="text"
-                  id="observacoes"
-                  value={form.observacoes}
-                  onChange={handleChange}
-                  placeholder="Digite observações sobre o pet (opcional)"
-                />
-              </div>
+                
               <button type="submit" className="register-btn">Cadastrar</button>
             </form>
           </div>

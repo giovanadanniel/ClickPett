@@ -1780,3 +1780,13 @@ footer {
     color: white; 
     border-color: #e74c3c;
 }
+
+.register-form input {
+    font-family: 'Candara', sans-serif; /* Igual ao formulário */
+    font-size: 1em; /* Ajuste para consistência */
+}
+
+.login-form input {
+    font-family: 'Candara', sans-serif; /* Igual ao formulário */
+    font-size: 1em; /* Ajuste para consistência */
+}
