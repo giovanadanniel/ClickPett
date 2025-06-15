@@ -1327,58 +1327,103 @@ footer {
 }
 
 /* Ajustar o estilo das caixinhas */
+/* Estilos para os Cards de Pet */
 .pet-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 15px;
-  width: 250px; /* Largura fixa para manter o alinhamento */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 12px;
+    padding: 25px;
+    width: 280px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    background-color: #ffffff;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 15px; /* Espaço entre os cards */
+}
+
+.pet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .pet-card h2 {
-  margin: 0 0 10px;
+    color: #0056b3;
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pet-card p {
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.pet-card strong {
+    color: #333;
+}
+
+.pet-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .pet-actions button {
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Botão de editar */
-.pet-actions button:first-child {
-  background-color: transparent;
-  color: #0056b3; /* Azul */
-  border: 2px solid #0056b3;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.pet-actions button:first-child { /* Botão Editar */
+    background-color: #e0f2f7;
+    color: #0056b3;
+    border: none;
 }
 
 .pet-actions button:first-child:hover {
-  background-color: #0056b3; /* Azul preenchido */
-  color: white;
+    background-color: #cce7f2;
+    color: #004080;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.1);
 }
 
-/* Botão de excluir */
-.pet-actions button:last-child {
-  background-color: transparent;
-  color: #e74c3c; /* Vermelho */
-  border: 2px solid #e74c3c;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.pet-actions button:last-child { /* Botão Excluir */
+    background-color: #ffebee;
+    color: #e74c3c;
+    border: none;
 }
 
 .pet-actions button:last-child:hover {
-  background-color: #e74c3c; /* Vermelho preenchido */
-  color: white;
+    background-color: #ffcccb;
+    color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1);
+}
+
+/* Container da lista de pets */
+.pets-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start; /* Alinha as caixinhas à esquerda */
+    margin-top: 20px;
+    padding-left: 20px; /* Adiciona um espaçamento à esquerda */
+}
+
+.meus-pets-container h1 {
+    color: #0056b3;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 /* Estilo para a página de Meus Serviços */
@@ -1399,53 +1444,103 @@ footer {
 }
 
 /* Ajustar o estilo das caixinhas */
+/* Estilos para os Cards de Serviço */
 .servico-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 15px;
-  width: 250px; /* Largura fixa para manter o alinhamento */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 12px;
+    padding: 25px;
+    width: 280px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    background-color: #ffffff;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 15px; /* Espaço entre os cards */
+}
+
+.servico-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .servico-card h2 {
-  margin: 0 0 10px;
+    color: #0056b3;
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.servico-card p {
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.servico-card strong {
+    color: #333;
+}
+
+.servico-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .servico-actions button {
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Botão de editar */
-.servico-actions button:first-child {
-  background-color: transparent;
-  color: #0056b3; /* Azul */
-  border: 2px solid #0056b3;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.servico-actions button:first-child { /* Botão Editar */
+    background-color: #e0f2f7;
+    color: #0056b3;
+    border: none;
 }
 
 .servico-actions button:first-child:hover {
-  background-color: #0056b3; /* Azul preenchido */
-  color: white;
+    background-color: #cce7f2;
+    color: #004080;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.1);
 }
 
-/* Botão de excluir */
-.servico-actions button:last-child {
-  background-color: transparent;
-  color: #e74c3c; /* Vermelho */
-  border: 2px solid #e74c3c;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.servico-actions button:last-child { /* Botão Excluir */
+    background-color: #ffebee;
+    color: #e74c3c;
+    border: none;
+}
+
+.servico-actions button:last-child:hover {
+    background-color: #ffcccb;
+    color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1);
+}
+
+/* Container da lista de serviços */
+.servicos-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start; /* Alinha as caixinhas à esquerda */
+    margin-top: 20px;
+    padding-left: 20px; /* Adiciona um espaçamento à esquerda */
+}
+
+.meus-servicos-page h1 {
+    color: #0056b3;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .servico-actions button:last-child:hover {
@@ -1466,65 +1561,104 @@ footer {
   margin-left: 20px;
 }
 
+/* Estilos para os Cards de Agendamento */
 .agendamento-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+    border: none; /* Remove borda agressiva */
+    border-radius: 12px; /* Cantos mais arredondados */
+    padding: 25px; /* Mais espaço interno */
+    width: 280px; /* Largura padrão */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* Sombra mais suave */
+    background-color: #ffffff; /* Fundo branco */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Transição suave */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 15px; /* Espaço entre os cards */
+}
+
+.agendamento-card:hover {
+    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); /* Sombra mais proeminente no hover */
 }
 
 .agendamento-card h2 {
-  margin: 0 0 10px;
-  color: #007bff;
+    color: #0056b3; /* Cor do título */
+    font-size: 1.4em; /* Tamanho do título */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
 }
 
 .agendamento-card p {
-  margin: 5px 0;
-  font-size: 14px;
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: #555; /* Cor do texto de detalhes */
+}
+
+.agendamento-card strong {
+    color: #333; /* Cor mais escura para negrito */
+}
+
+.agendamento-actions {
+    display: flex;
+    justify-content: flex-end; /* Alinhar botões à direita */
+    gap: 10px; /* Espaço entre os botões */
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0; /* Linha divisória acima dos botões */
 }
 
 .agendamento-actions button {
-  margin: 5px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 20px; /* Botões totalmente arredondados */
+    font-weight: 500;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* Botão de editar */
-.agendamento-actions button:first-child {
-  background-color: transparent;
-  color: #0056b3; /* Azul */
-  border: 2px solid #0056b3;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.agendamento-actions button:first-child { /* Botão Editar */
+    background-color: #e0f2f7; /* Azul claro */
+    color: #0056b3; /* Azul primário */
+    border: none;
 }
 
 .agendamento-actions button:first-child:hover {
-  background-color: #0056b3; /* Azul preenchido */
-  color: white;
+    background-color: #cce7f2;
+    color: #004080;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.1);
 }
 
-/* Botão de excluir */
-.agendamento-actions button:last-child {
-  background-color: transparent;
-  color: #e74c3c; /* Vermelho */
-  border: 2px solid #e74c3c;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+.agendamento-actions button:last-child { /* Botão Excluir */
+    background-color: #ffebee; /* Vermelho claro */
+    color: #e74c3c; /* Vermelho */
+    border: none;
 }
 
 .agendamento-actions button:last-child:hover {
-  background-color: #e74c3c; /* Vermelho preenchido */
-  color: white;
+    background-color: #ffcccb;
+    color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1);
+}
+
+/* Container da lista de agendamentos */
+.agendamentos-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Espaço entre os cards */
+    justify-content: flex-start; /* Alinha as caixinhas à esquerda */
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.agendamentos-container h1 {
+    color: #0056b3;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .btn-delete {
@@ -1536,6 +1670,69 @@ footer {
   margin-top: 20px;
 }
 
-.btn-delete:hover {
-  background-color: #e60000;
+/* Ensure buttons remain white with square borders matching active color */
+.agendamento-actions button:first-child,
+.pet-actions button:first-child,
+.servico-actions button:first-child {
+    background-color: white; /* White background */
+    color: #003d82; /* Dark blue text */
+    border: 2px solid #003d82; /* Dark blue border */
+    border-radius: 4px; /* Slightly rounded corners */
+    padding: 8px 16px; /* Smaller size */
+    font-size: 0.9em; /* Adjust font size */
+    transition: all 0.3s ease;
+}
+
+.agendamento-actions button:first-child:hover,
+.pet-actions button:first-child:hover,
+.servico-actions button:first-child:hover {
+    background-color: #003d82; /* Dark blue background on hover */
+    color: white; /* White text on hover */
+    border-color: #003d82; /* Match border color to background */
+}
+
+.agendamento-actions button:first-child:active,
+.pet-actions button:first-child:active,
+.servico-actions button:first-child:active {
+    background-color: #002a5c; /* Even darker blue on click */
+    color: white; /* White text on click */
+    border-color: #002a5c; /* Match border color to background */
+}
+
+.agendamento-actions button:last-child,
+.pet-actions button:last-child,
+.servico-actions button:last-child {
+    background-color: white; /* White background */
+    color: #e74c3c; /* Red text */
+    border: 2px solid #e74c3c; /* Red border */
+    border-radius: 4px; /* Slightly rounded corners */
+    padding: 8px 16px; /* Smaller size */
+    font-size: 0.9em; /* Adjust font size */
+    transition: all 0.3s ease;
+}
+
+.agendamento-actions button:last-child:hover,
+.pet-actions button:last-child:hover,
+.servico-actions button:last-child:hover {
+    background-color: #e74c3c; /* Strong red background on hover */
+    color: white; /* White text on hover */
+    border-color: #e74c3c; /* Match border color to background */
+}
+
+.agendamento-actions button:last-child:active,
+.pet-actions button:last-child:active,
+.servico-actions button:last-child:active {
+    background-color: #c0392b; /* Even darker red on click */
+    color: white; /* White text on click */
+    border-color: #c0392b; /* Match border color to background */
+}
+
+/* Ensure all cards align to the left */
+.pets-list,
+.servicos-list,
+.agendamentos-list {
+    justify-content: flex-start; /* Align cards to the left */
+    padding: 0 20px;
+    max-width: 1200px;
+    margin: 20px auto;
 }
