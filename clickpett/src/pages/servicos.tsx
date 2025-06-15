@@ -72,7 +72,7 @@ const Servicos = () => {
         </div>
       </main>
 
-      <Footer/> {/* Usa o componente Header */}
+      <Footer/> {/* Usa o componente Footer */}
       
     </div>
   );

@@ -32,6 +32,7 @@ const Header: React.FC = () => {
     localStorage.removeItem('nomeUsuario');
     localStorage.removeItem('papelUsuario');
     localStorage.removeItem('token');
+    localStorage.removeItem('clienteId');
     setNomeUsuario(null);
     setPapelUsuario(null);
     navigate('/'); // Redirecionar para a página inicial
