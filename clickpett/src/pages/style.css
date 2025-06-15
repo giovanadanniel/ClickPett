@@ -1021,6 +1021,19 @@ footer {
     color: #e74c3c;
 }
 
+/* Style for the service price display */
+.preco-servico {
+    font-size: 1.2em; /* Slightly larger font size */
+    font-weight: bold; /* Make the text bold */
+    color: #0056b3; /* Use the primary blue color */
+    margin-top: 10px; /* Add some spacing above */
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 8px 12px; /* Add padding for a better look */
+    border-radius: 8px; /* Rounded corners */
+    display: inline-block; /* Ensure it wraps nicely */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
 @media (max-width: 768px) {
     .missao-visao {
         flex-direction: column;
