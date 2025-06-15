@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Swal from 'sweetalert2';
 import './style.css';
+import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
 
 interface Servico {
   id: number;
@@ -98,7 +99,13 @@ const MeusServicos: React.FC = () => {
         <h1>Meus Serviços</h1>
         {loading ? (
           <p>Carregando...</p>
-        ) : servicos.length > 0 ? (
+        ) : servicos.length === 0 ? (
+          <div className="empty-state">
+            <i className="bi bi-calendar-x fs-1 mb-3"></i>
+            <h5>Nenhum serviço encontrado</h5>
+            <p className="mb-0">Você ainda não cadastrou nenhum serviço ou não há serviços com os filtros aplicados.</p>
+          </div>
+        ) : (
           <div className="servicos-list">
             {servicos.map((servico) => (
               <div key={servico.id} className="servico-card">
@@ -111,8 +118,6 @@ const MeusServicos: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : (
-          <p>Você ainda não cadastrou nenhum serviço.</p>
         )}
       </div>
       <Footer />

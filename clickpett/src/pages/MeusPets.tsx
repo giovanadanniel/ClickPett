@@ -4,6 +4,7 @@ import Header from '../components/Header'; // Importar o Header
 import Footer from '../components/Footer'; // Importar o Footer
 import Swal from 'sweetalert2';
 import './style.css';
+import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
 
 interface Pet {
   id: number;
@@ -142,31 +143,39 @@ const handleExcluir = async (id: number) => {
 
 return (
   <>
-    <Header /> {/* Adiciona o Header */}
+    <Header />
     <div className="meus-pets-container">
       <h1>Meus Pets</h1>
-      <div className="pets-list">
-        {pets.map((pet) => (
-          <div key={pet.id} className="pet-card">
-            <h2>{pet.nome}</h2>
-            <p>Idade: {pet.idade}</p>
-            <p>
-              Peso: {pet.peso && !isNaN(Number(pet.peso)) 
-                ? (Number.isInteger(Number(pet.peso)) 
-                  ? Number(pet.peso) 
-                  : Number(pet.peso).toFixed(3).replace('.', ',')) 
-                : 'N/A'} kg
-            </p> {/* Exibe com até 3 números depois da vírgula */}
-            <p>Raça: {pet.raca}</p>
-            <div className="pet-actions">
-              <button onClick={() => handleEditar(pet.id)}>Editar</button>
-              <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
+      {pets.length === 0 ? (
+        <div className="empty-state">
+          <i className="bi bi-calendar-x fs-1 mb-3"></i>
+          <h5>Nenhum pet encontrado</h5>
+          <p className="mb-0">Você ainda não cadastrou nenhum pet ou não há pets com os filtros aplicados.</p>
+        </div>
+      ) : (
+        <div className="pets-list">
+          {pets.map((pet) => (
+            <div key={pet.id} className="pet-card">
+              <h2>{pet.nome}</h2>
+              <p>Idade: {pet.idade}</p>
+              <p>
+                Peso: {pet.peso && !isNaN(Number(pet.peso)) 
+                  ? (Number.isInteger(Number(pet.peso)) 
+                    ? Number(pet.peso) 
+                    : Number(pet.peso).toFixed(3).replace('.', ',')) 
+                  : 'N/A'} kg
+              </p>
+              <p>Raça: {pet.raca}</p>
+              <div className="pet-actions">
+                <button onClick={() => handleEditar(pet.id)}>Editar</button>
+                <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
-    <Footer /> {/* Adiciona o Footer */}
+    <Footer />
   </>
 );
 

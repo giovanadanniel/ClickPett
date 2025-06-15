@@ -6,6 +6,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons
 
 interface Agendamento {
   id: number;
@@ -80,21 +81,29 @@ const handleExcluir = (id: number) => {
       <Header />
       <main className="agendamentos-container">
         <h1 className="title">Meus Agendamentos</h1>
-        <div className="agendamentos-list">
-          {agendamentos.map((agendamento) => (
-            <div key={agendamento.id} className="agendamento-card">
-              <h2>Serviço: {agendamento.servico}</h2>
-              <p><strong>Pet:</strong> {agendamento.pet}</p>
-              <p><strong>Data e Hora:</strong> {new Date(agendamento.dataHora).toLocaleString()}</p>
-              <p><strong>Observação:</strong> {agendamento.observacao || 'Nenhuma observação'}</p>
-              <p><strong>Preço do Serviço:</strong> R$ {agendamento.preco.toFixed(2).replace('.', ',')}</p>
-              <div className="agendamento-actions">
-                <button onClick={() => handleEditar(agendamento.id)}>Editar</button>
-                <button onClick={() => handleExcluir(agendamento.id)}>Excluir</button>
+        {agendamentos.length === 0 ? (
+          <div className="empty-state">
+            <i className="bi bi-calendar-x fs-1 mb-3"></i>
+            <h5>Nenhum agendamento encontrado</h5>
+            <p className="mb-0">Você ainda não fez nenhum agendamento ou não há agendamentos com os filtros aplicados.</p>
+          </div>
+        ) : (
+          <div className="agendamentos-list">
+            {agendamentos.map((agendamento) => (
+              <div key={agendamento.id} className="agendamento-card">
+                <h2>Serviço: {agendamento.servico}</h2>
+                <p><strong>Pet:</strong> {agendamento.pet}</p>
+                <p><strong>Data e Hora:</strong> {new Date(agendamento.dataHora).toLocaleString()}</p>
+                <p><strong>Observação:</strong> {agendamento.observacao || 'Nenhuma observação'}</p>
+                <p><strong>Preço do Serviço:</strong> R$ {agendamento.preco.toFixed(2).replace('.', ',')}</p>
+                <div className="agendamento-actions">
+                  <button onClick={() => handleEditar(agendamento.id)}>Editar</button>
+                  <button onClick={() => handleExcluir(agendamento.id)}>Excluir</button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
       <Footer />
     </>
