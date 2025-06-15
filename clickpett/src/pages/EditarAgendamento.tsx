@@ -30,6 +30,7 @@ const EditarAgendamento: React.FC = () => {
 
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
+  const [precoServico, setPrecoServico] = useState<string>('');
 
   useEffect(() => {
     document.title = 'Editar Agendamento - Click Pet';
@@ -81,6 +82,22 @@ const EditarAgendamento: React.FC = () => {
           hora: formattedTime,
           observacoes: observacao || '',
         });
+
+        // Buscar o preço do serviço inicialmente selecionado
+        axios.get(`http://localhost:5000/api/servico/${servicoId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+          .then((response) => {
+            const preco = response.data.preco;
+            const formattedPreco = preco.toString().replace('.', ',');
+            setPrecoServico(formattedPreco);
+          })
+          .catch((error) => {
+            console.error('Erro ao buscar preço do serviço:', error);
+            setPrecoServico('');
+          });
       })
       .catch((error) => {
         console.error('Erro ao buscar agendamento:', error);
@@ -90,6 +107,29 @@ const EditarAgendamento: React.FC = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleServicoChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedServicoId = e.target.value;
+    setFormData((prev) => ({ ...prev, servicoId: selectedServicoId }));
+
+    // Fetch the price of the selected service
+    const token = localStorage.getItem('token');
+    axios.get(`http://localhost:5000/api/servico/${selectedServicoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        const preco = response.data.preco;
+        // Format the price to use a comma instead of a dot
+        const formattedPreco = preco.toString().replace('.', ',');
+        setPrecoServico(formattedPreco);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar preço do serviço:', error);
+        setPrecoServico('');
+      });
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -262,6 +302,10 @@ const EditarAgendamento: React.FC = () => {
     });
   };
 
+  const data = formData.data;
+  const hora = formData.hora;
+  const observacoes = formData.observacoes;
+
   return (
     <>
       <Header />
@@ -274,7 +318,7 @@ const EditarAgendamento: React.FC = () => {
             name="servicoId"
             required
             value={formData.servicoId}
-            onChange={handleChange}
+            onChange={handleServicoChange}
           >
             <option value="">Selecione...</option>
             {servicos.map((servico) => (
@@ -283,6 +327,10 @@ const EditarAgendamento: React.FC = () => {
               </option>
             ))}
           </select>
+
+          {precoServico && (
+            <p className="preco-servico">Preço: R$ {precoServico}</p>
+          )}
 
           <label htmlFor="petId">Nome do Pet:</label>
           <select
@@ -331,7 +379,6 @@ const EditarAgendamento: React.FC = () => {
           />
 
           <button type="submit" className="btn-reserva">Atualizar Agendamento</button>
-
         </form>
       </main>
       <Footer />

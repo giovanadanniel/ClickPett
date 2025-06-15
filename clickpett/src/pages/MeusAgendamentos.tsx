@@ -13,6 +13,7 @@ interface Agendamento {
   observacao: string;
   servico: string;
   pet: string;
+  preco: number; // Add price to the interface
 }
 
 const MeusAgendamentos: React.FC = () => {
@@ -28,7 +29,11 @@ const MeusAgendamentos: React.FC = () => {
       },
     })
       .then((response) => {
-        setAgendamentos(response.data);
+        const agendamentosComPreco = response.data.map((agendamento: any) => ({
+          ...agendamento,
+          preco: parseFloat(agendamento.preco), // Ensure price is a number
+        }));
+        setAgendamentos(agendamentosComPreco);
       })
       .catch((error) => {
         console.error('Erro ao buscar agendamentos:', error);
@@ -82,6 +87,7 @@ const handleExcluir = (id: number) => {
               <p><strong>Pet:</strong> {agendamento.pet}</p>
               <p><strong>Data e Hora:</strong> {new Date(agendamento.dataHora).toLocaleString()}</p>
               <p><strong>Observação:</strong> {agendamento.observacao || 'Nenhuma observação'}</p>
+              <p><strong>Preço do Serviço:</strong> R$ {agendamento.preco.toFixed(2).replace('.', ',')}</p>
               <div className="agendamento-actions">
                 <button onClick={() => handleEditar(agendamento.id)}>Editar</button>
                 <button onClick={() => handleExcluir(agendamento.id)}>Excluir</button>

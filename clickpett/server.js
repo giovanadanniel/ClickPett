@@ -566,6 +566,7 @@ app.get('/api/meus-agendamentos', authenticateToken, (req, res) => {
       Agendamento.Data_Hora AS dataHora,
       Agendamento.Observacao AS observacao,
       Servicos.Nome_Servico AS servico,
+      Servicos.Preco_Servico AS preco,
       Pet.Nome_Pet AS pet
     FROM Agendamento
     INNER JOIN Servicos ON Agendamento.fk_Servicos__ID_Servicos = Servicos.ID_Servicos

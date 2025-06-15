@@ -28,6 +28,7 @@ const ReservaServico = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
+  const [precoServico, setPrecoServico] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,10 +97,93 @@ const ReservaServico = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleServicoChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const selectedServicoId = e.target.value;
+    setFormData((prev) => ({ ...prev, servico: selectedServicoId }));
+
+    // Fetch the price of the selected service
+    const token = localStorage.getItem('token');
+    axios.get(`http://localhost:5000/api/servico/${selectedServicoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        const preco = response.data.preco;
+        // Format the price to use a comma instead of a dot
+        const formattedPreco = preco.toString().replace('.', ',');
+        setPrecoServico(formattedPreco);
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar preço do serviço:', error);
+        setPrecoServico('');
+      });
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Lógica de validação e envio do formulário
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      Swal.fire({
+        title: 'Erro',
+        text: 'Você precisa estar logado para realizar um agendamento!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+      return;
+    }
+
+    const { servico, petNome, data, hora, observacoes } = formData;
+
+    if (!servico || !petNome || !data || !hora) {
+      Swal.fire({
+        title: 'Erro',
+        text: 'Todos os campos obrigatórios devem ser preenchidos!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/agendamento',
+        {
+          dataHora: `${data}T${hora}`,
+          observacao: observacoes,
+          servicoId: servico,
+          petId: pets.find((pet) => pet.nome === petNome)?.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      Swal.fire({
+        title: 'Sucesso',
+        text: 'Reserva realizada com sucesso!',
+        icon: 'success',
+        background: '#fff',
+        color: '#000',
+      }).then(() => {
+        navigate('/meus-agendamentos'); // Redirecionar para a página de agendamentos
+      });
+    } catch (error) {
+      console.error('Erro ao enviar reserva:', error);
+      Swal.fire({
+        title: 'Erro',
+        text: 'Ocorreu um erro ao realizar a reserva. Tente novamente mais tarde.',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
   };
 
   // Exibir um indicador de carregamento enquanto as verificações estão em andamento
@@ -120,15 +204,19 @@ const ReservaServico = () => {
             name="servico"
             required
             value={formData.servico}
-            onChange={handleChange}
+            onChange={handleServicoChange}
           >
             <option value="">Selecione...</option>
             {servicos.map((servico) => (
-              <option key={servico.id} value={servico.nome}>
+              <option key={servico.id} value={servico.id}>
                 {servico.nome}
               </option>
             ))}
           </select>
+
+          {precoServico && (
+            <p className="preco-servico">Preço: R$ {precoServico}</p>
+          )}
 
           <label htmlFor="petNome">Nome do Pet:</label>
           <select
