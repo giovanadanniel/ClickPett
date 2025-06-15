@@ -16,7 +16,7 @@ interface Pet {
   nome: string;
 }
 
-const ReservaServico = () => {
+const AgendarServico = () => {
   const [formData, setFormData] = useState({
     servico: '',
     petNome: '',
@@ -273,4 +273,4 @@ const ReservaServico = () => {
   );
 };
 
-export default ReservaServico;
+export default AgendarServico;

@@ -195,7 +195,7 @@ const ClickPetHome: React.FC = () => {
             <h2>Nossos Serviços</h2>
             <div className="destaques-grid">
               <div className="destaque-card">
-                <div className="destaque-img" style={{ backgroundImage: "url('banho-pet.jpg')" }}></div>
+                <div className="destaque-img" style={{ backgroundImage: "url('images/cachorro.png')" }}></div>
                 <div className="destaque-content">
                   <h3>Banho Completo</h3>
                   <p>Hidratação, limpeza de ouvidos e corte de unhas com produtos de alta qualidade.</p>
@@ -203,7 +203,7 @@ const ClickPetHome: React.FC = () => {
                 </div>
               </div>
               <div className="destaque-card">
-                <div className="destaque-img" style={{ backgroundImage: "url('tosa-pet.jpg')" }}></div>
+                <div className="destaque-img" style={{ backgroundImage: "url('images/cachorroTosa.png')" }}></div>
                 <div className="destaque-content">
                   <h3>Tosa Higiênica</h3>
                   <p>Tosa profissional realizada por especialistas em cuidados com pelagem animal.</p>
@@ -211,7 +211,7 @@ const ClickPetHome: React.FC = () => {
                 </div>
               </div>
               <div className="destaque-card">
-                <div className="destaque-img" style={{ backgroundImage: "url('vet-pet.jpg')" }}></div>
+                <div className="destaque-img" style={{ backgroundImage: "url('images/cachorroConsulta.png')" }}></div>
                 <div className="destaque-content">
                   <h3>Consulta Veterinária</h3>
                   <p>Atendimento especializado com profissionais qualificados para cuidar da saúde do seu pet.</p>

@@ -6,7 +6,7 @@ import Cadastro from './pages/cadastro';
 import ClickPetSobre from './pages/sobre';
 import ContatoPage from './pages/cantato';
 import Servicos from './pages/servicos';
-import ReservaServico from './pages/reserva';
+import AgendarServico from './pages/agendar';
 import FAQPage from './pages/faq'; 
 import EditarConta from './pages/editarConta';
 import CadastrarPet from './pages/cadastroPet';
@@ -28,7 +28,7 @@ function App() {
         <Route path="/sobre" element={<ClickPetSobre />} />
         <Route path="/contato" element={<ContatoPage />} />
         <Route path="/servicos" element={<Servicos />} />
-        <Route path="/reserva" element={<ReservaServico />} />
+        <Route path="/reserva" element={<AgendarServico />} />
         <Route path="/faq" element={<FAQPage />} /> 
         <Route path="/editar-conta" element={<EditarConta />} />
         <Route path="/cadastrar-pet" element={<CadastrarPet />} />
