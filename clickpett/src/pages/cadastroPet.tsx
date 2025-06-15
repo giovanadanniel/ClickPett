@@ -6,9 +6,18 @@ import Swal from 'sweetalert2';
 import './style.css';
 
 export default function CadastrarPet() {
+  const navigate = useNavigate(); // Inicializar o hook useNavigate
+
   useEffect(() => {
     document.title = 'Cadastrar Pet - Click Pet';
-  }, []);
+
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '1') {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const [form, setForm] = useState({
     nome: '',
@@ -16,8 +25,6 @@ export default function CadastrarPet() {
     peso: '',
     raca: '', // Novo campo
   });
-
-  const navigate = useNavigate(); // Inicializar o hook useNavigate
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

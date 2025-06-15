@@ -23,161 +23,170 @@ const MeusPets: React.FC = () => {
   }, []);
 
   useEffect(() => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    console.error('Token não encontrado. Redirecionando para login.');
-    navigate('/login');
-    return;
-  }
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
 
-  fetch('http://localhost:5000/api/meus-pets', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((response) => {
-      if (response.status === 403) {
-        // Token expirado, tente renovar
-        return fetch('http://localhost:5000/api/refresh-token', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((refreshResponse) => {
-            if (!refreshResponse.ok) {
-              throw new Error('Erro ao renovar o token');
-            }
-            return refreshResponse.json();
+    if (!token || papelUsuario !== '1') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token não encontrado. Redirecionando para login.');
+      navigate('/login');
+      return;
+    }
+
+    fetch('http://localhost:5000/api/meus-pets', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          // Token expirado, tente renovar
+          return fetch('http://localhost:5000/api/refresh-token', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           })
-          .then((data) => {
-            localStorage.setItem('token', data.token); // Salve o novo token
-            // Refaça a requisição original
-            return fetch('http://localhost:5000/api/meus-pets', {
-              headers: {
-                Authorization: `Bearer ${data.token}`,
-              },
+            .then((refreshResponse) => {
+              if (!refreshResponse.ok) {
+                throw new Error('Erro ao renovar o token');
+              }
+              return refreshResponse.json();
+            })
+            .then((data) => {
+              localStorage.setItem('token', data.token); // Salve o novo token
+              // Refaça a requisição original
+              return fetch('http://localhost:5000/api/meus-pets', {
+                headers: {
+                  Authorization: `Bearer ${data.token}`,
+                },
+              });
             });
-          });
-      }
-      return response;
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Erro ao buscar pets');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (Array.isArray(data)) {
-        setPets(data);
-      } else {
-        console.error('Resposta inesperada da API:', data);
+        }
+        return response;
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erro ao buscar pets');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setPets(data);
+        } else {
+          console.error('Resposta inesperada da API:', data);
+          setPets([]);
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar pets:', error);
         setPets([]);
-      }
-    })
-    .catch((error) => {
-      console.error('Erro ao buscar pets:', error);
-      setPets([]);
-    });
-}, [navigate]);
+      });
+  }, [navigate]);
 
   const handleEditar = (id: number) => {
     navigate(`/editar-pet/${id}`);
   };
 
-const handleExcluir = async (id: number) => {
-  const token = localStorage.getItem('token');
+  const handleExcluir = async (id: number) => {
+    const token = localStorage.getItem('token');
 
-  // Exibir confirmação antes de excluir
-  const confirmacao = await Swal.fire({
-    title: 'Confirmação',
-    text: 'Tem certeza que deseja excluir este pet?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33', // Cor do botão de confirmação
-    cancelButtonColor: '#3085d6', // Cor do botão de cancelamento
-    confirmButtonText: 'Sim, excluir!',
-    cancelButtonText: 'Cancelar',
-    background: '#fff', // Fundo branco
-    color: '#000', // Texto preto
-  });
-
-  if (!confirmacao.isConfirmed) {
-    return; // Cancelar exclusão
-  }
-
-  try {
-    const response = await fetch(`http://localhost:5000/api/pet/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    // Exibir confirmação antes de excluir
+    const confirmacao = await Swal.fire({
+      title: 'Confirmação',
+      text: 'Tem certeza que deseja excluir este pet?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33', // Cor do botão de confirmação
+      cancelButtonColor: '#3085d6', // Cor do botão de cancelamento
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar',
+      background: '#fff', // Fundo branco
+      color: '#000', // Texto preto
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Erro ao excluir pet!');
+    if (!confirmacao.isConfirmed) {
+      return; // Cancelar exclusão
     }
 
-    Swal.fire({
-      title: 'Sucesso!',
-      text: 'Pet excluído com sucesso!',
-      icon: 'success',
-      background: '#fff', // Fundo branco
-      color: '#000', // Texto preto
-    });
+    try {
+      const response = await fetch(`http://localhost:5000/api/pet/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    // Atualizar a lista de pets após a exclusão
-    setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
-  } catch (error: any) {
-    Swal.fire({
-      title: 'Erro',
-      text: error.message,
-      icon: 'error',
-      background: '#fff', // Fundo branco
-      color: '#000', // Texto preto
-    });
-  }
-};
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao excluir pet!');
+      }
 
-return (
-  <>
-    <Header />
-    <div className="meus-pets-container">
-      <h1>Meus Pets</h1>
-      {pets.length === 0 ? (
-        <div className="empty-state">
-          <i className="bi bi-calendar-x fs-1 mb-3"></i>
-          <h5>Nenhum pet encontrado</h5>
-          <p className="mb-0">Você ainda não cadastrou nenhum pet ou não há pets com os filtros aplicados.</p>
-        </div>
-      ) : (
-        <div className="pets-list">
-          {pets.map((pet) => (
-            <div key={pet.id} className="pet-card">
-              <h2>{pet.nome}</h2>
-              <p>Idade: {pet.idade}</p>
-              <p>
-                Peso: {pet.peso && !isNaN(Number(pet.peso)) 
-                  ? (Number.isInteger(Number(pet.peso)) 
-                    ? Number(pet.peso) 
-                    : Number(pet.peso).toFixed(3).replace('.', ',')) 
-                  : 'N/A'} kg
-              </p>
-              <p>Raça: {pet.raca}</p>
-              <div className="pet-actions">
-                <button onClick={() => handleEditar(pet.id)}>Editar</button>
-                <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
+      Swal.fire({
+        title: 'Sucesso!',
+        text: 'Pet excluído com sucesso!',
+        icon: 'success',
+        background: '#fff', // Fundo branco
+        color: '#000', // Texto preto
+      });
+
+      // Atualizar a lista de pets após a exclusão
+      setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
+    } catch (error: any) {
+      Swal.fire({
+        title: 'Erro',
+        text: error.message,
+        icon: 'error',
+        background: '#fff', // Fundo branco
+        color: '#000', // Texto preto
+      });
+    }
+  };
+
+  return (
+    <>
+      <Header />
+      <div className="meus-pets-container">
+        <h1>Meus Pets</h1>
+        {pets.length === 0 ? (
+          <div className="empty-state">
+            <i className="bi bi-calendar-x fs-1 mb-3"></i>
+            <h5>Nenhum pet encontrado</h5>
+            <p className="mb-0">Você ainda não cadastrou nenhum pet ou não há pets com os filtros aplicados.</p>
+          </div>
+        ) : (
+          <div className="pets-list">
+            {pets.map((pet) => (
+              <div key={pet.id} className="pet-card">
+                <h2>{pet.nome}</h2>
+                <p>Idade: {pet.idade}</p>
+                <p>
+                  Peso: {pet.peso && !isNaN(Number(pet.peso)) 
+                    ? (Number.isInteger(Number(pet.peso)) 
+                      ? Number(pet.peso) 
+                      : Number(pet.peso).toFixed(3).replace('.', ',')) 
+                    : 'N/A'} kg
+                </p>
+                <p>Raça: {pet.raca}</p>
+                <div className="pet-actions">
+                  <button onClick={() => handleEditar(pet.id)}>Editar</button>
+                  <button onClick={() => handleExcluir(pet.id)}>Excluir</button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-    <Footer />
-  </>
-);
+            ))}
+          </div>
+        )}
+      </div>
+      <Footer />
+    </>
+  );
 
 };
 

@@ -19,6 +19,15 @@ const MeusServicos: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '2') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
     const clienteId = localStorage.getItem('clienteId'); // Recuperar o ID do cliente do localStorage
 
     if (!token || !clienteId) {

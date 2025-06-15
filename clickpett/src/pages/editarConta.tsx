@@ -21,6 +21,16 @@ export default function EditarConta() {
   const token = localStorage.getItem('token'); // Recuperar o token do usuário logado
   const navigate = useNavigate(); // Para redirecionar após salvar as alterações
 
+  // Verificação de autenticação e autorização
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '1') {
+      navigate('/');
+    }
+  }, [navigate]);
+
   // Função para buscar os dados do usuário logado
   useEffect(() => {
     const fetchUserData = async () => {

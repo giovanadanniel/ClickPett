@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importar o useNavigate
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -11,6 +11,15 @@ export default function CadastroServico() {
     precoServico: '',
   });
   const navigate = useNavigate(); // Inicializar o useNavigate
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '2') {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

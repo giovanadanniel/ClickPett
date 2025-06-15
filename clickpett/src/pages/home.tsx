@@ -144,14 +144,14 @@ const ClickPetHome: React.FC = () => {
                       </div>
                     </div>
                     <div className="destaque-card">
-                      <div className="destaque-img" style={{ backgroundImage: "url('pet-produtos.jpg')" }}></div>
+                      <div className="destaque-img" style={{ backgroundImage: "url('images/produtospremium.jpg')" }}></div>
                       <div className="destaque-content">
                         <h3>Produtos Premium</h3>
                         <p>Utilizamos apenas produtos de alta qualidade, hipoalergênicos e testados dermatologicamente.</p>
                       </div>
                     </div>
                     <div className="destaque-card">
-                      <div className="destaque-img" style={{ backgroundImage: "url('pet-ambiente.jpg')" }}></div>
+                      <div className="destaque-img" style={{ backgroundImage: "url('images/acolhedor.jpg')" }}></div>
                       <div className="destaque-content">
                         <h3>Ambiente Acolhedor</h3>
                         <p>Espaço projetado para o conforto e segurança dos pets, reduzindo o estresse durante os procedimentos.</p>

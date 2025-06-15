@@ -1021,17 +1021,17 @@ footer {
     color: #e74c3c;
 }
 
-/* Style for the service price display */
+
 .preco-servico {
-    font-size: 1.2em; /* Slightly larger font size */
-    font-weight: bold; /* Make the text bold */
-    color: #0056b3; /* Use the primary blue color */
-    margin-top: 10px; /* Add some spacing above */
-    background-color: #f0f8ff; /* Light blue background */
-    padding: 8px 12px; /* Add padding for a better look */
-    border-radius: 8px; /* Rounded corners */
-    display: inline-block; /* Ensure it wraps nicely */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    font-size: 1.2em; 
+    font-weight: bold; 
+    color: #0056b3; 
+    margin-top: 10px; 
+    background-color: #f0f8ff; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    display: inline-block;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
 
 @media (max-width: 768px) {
@@ -1333,15 +1333,14 @@ footer {
 /* Ajustar o container das caixinhas */
 .pets-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-  gap: 20px; /* Space between cards */
-  justify-content: center; /* Center align the grid */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px; 
+  justify-content: center; 
   padding: 20px;
   max-width: 1200px;
   margin: 20px auto;
 }
 
-/* Ajustar o estilo das caixinhas */
 /* Estilos para os Cards de Pet */
 .pet-card {
     border: none;
@@ -1427,9 +1426,9 @@ footer {
 /* Container da lista de pets */
 .pets-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Center align the grid */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    justify-content: center; 
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1452,9 +1451,9 @@ footer {
 /* Ajustar o container das caixinhas */
 .servicos-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-  gap: 20px; /* Space between cards */
-  justify-content: center; /* Center align the grid */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px; 
+  justify-content: center; 
   padding: 20px;
   max-width: 1200px;
   margin: 20px auto;
@@ -1546,9 +1545,9 @@ footer {
 /* Container da lista de serviços */
 .servicos-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Center align the grid */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    justify-content: center;
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1573,9 +1572,9 @@ footer {
 
 .agendamentos-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-  gap: 20px; /* Space between cards */
-  justify-content: center; /* Center align the grid */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px; 
+  justify-content: center; 
   padding: 20px;
   max-width: 1200px;
   margin: 20px auto;
@@ -1583,30 +1582,30 @@ footer {
 
 /* Estilos para os Cards de Agendamento */
 .agendamento-card {
-    border: none; /* Remove borda agressiva */
-    border-radius: 12px; /* Cantos mais arredondados */
-    padding: 25px; /* Mais espaço interno */
-    width: 280px; /* Largura padrão */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* Sombra mais suave */
-    background-color: #ffffff; /* Fundo branco */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Transição suave */
+    border: none; 
+    border-radius: 12px;
+    padding: 25px; 
+    width: 280px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); 
+    background-color: #ffffff; 
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    margin: 15px; /* Espaço entre os cards */
+    margin: 15px; 
 }
 
 .agendamento-card:hover {
-    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); /* Sombra mais proeminente no hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); 
 }
 
 .agendamento-card h2 {
-    color: #0056b3; /* Cor do título */
-    font-size: 1.4em; /* Tamanho do título */
+    color: #0056b3;
+    font-size: 1.4em; 
     margin-bottom: 15px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f0f0f0; /* Linha divisória sutil */
+    border-bottom: 1px solid #f0f0f0; 
 }
 
 .agendamento-card p {
@@ -1621,16 +1620,16 @@ footer {
 
 .agendamento-actions {
     display: flex;
-    justify-content: flex-end; /* Alinhar botões à direita */
-    gap: 10px; /* Espaço entre os botões */
+    justify-content: flex-end; 
+    gap: 10px; 
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #f0f0f0; /* Linha divisória acima dos botões */
+    border-top: 1px solid #f0f0f0; 
 }
 
 .agendamento-actions button {
     padding: 10px 18px;
-    border-radius: 20px; /* Botões totalmente arredondados */
+    border-radius: 20px; 
     font-weight: 500;
     font-size: 0.9em;
     cursor: pointer;
@@ -1638,8 +1637,8 @@ footer {
 }
 
 .agendamento-actions button:first-child { /* Botão Editar */
-    background-color: #e0f2f7; /* Azul claro */
-    color: #0056b3; /* Azul primário */
+    background-color: #e0f2f7; 
+    color: #0056b3; 
     border: none;
 }
 
@@ -1666,9 +1665,9 @@ footer {
 /* Container da lista de agendamentos */
 .agendamentos-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Center align the grid */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    justify-content: center; 
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
@@ -1690,20 +1689,20 @@ footer {
   margin-top: 20px;
 }
 
-/* Align all cards to start from the left and follow the line */
+
 .pets-list,
 .servicos-list,
 .agendamentos-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Center align the grid */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px; 
+    justify-content: center; 
     padding: 20px;
     max-width: 1200px;
     margin: 20px auto;
 }
 
-/* Ensure service cards match pet cards */
+
 .servico-card {
     border: none;
     border-radius: 12px;
@@ -1741,43 +1740,43 @@ footer {
     color: #333;
 }
 
-/* Style for edit and delete buttons */
+
 .agendamento-actions button:first-child,
 .pet-actions button:first-child,
 .servico-actions button:first-child {
-    background-color: white; /* White background */
-    color: #003d82; /* Dark blue text */
-    border: 2px solid #003d82; /* Dark blue border */
-    border-radius: 6px; /* Slightly rounded corners */
-    padding: 8px 16px; /* Adjust padding */
-    font-size: 0.9em; /* Adjust font size */
+    background-color: white; 
+    color: #003d82; 
+    border: 2px solid #003d82;
+    border-radius: 6px; 
+    padding: 8px 16px; 
+    font-size: 0.9em; 
     transition: all 0.3s ease;
 }
 
 .agendamento-actions button:first-child:hover,
 .pet-actions button:first-child:hover,
 .servico-actions button:first-child:hover {
-    background-color: #003d82; /* Dark blue background on hover */
-    color: white; /* White text on hover */
-    border-color: #003d82; /* Match border color to background */
+    background-color: #003d82; 
+    color: white; 
+    border-color: #003d82; 
 }
 
 .agendamento-actions button:last-child,
 .pet-actions button:last-child,
 .servico-actions button:last-child {
-    background-color: white; /* White background */
-    color: #e74c3c; /* Red text */
-    border: 2px solid #e74c3c; /* Red border */
-    border-radius: 6px; /* Slightly rounded corners */
-    padding: 8px 16px; /* Adjust padding */
-    font-size: 0.9em; /* Adjust font size */
+    background-color: white; 
+    color: #e74c3c; 
+    border: 2px solid #e74c3c; 
+    border-radius: 6px; 
+    padding: 8px 16px; 
+    font-size: 0.9em; 
     transition: all 0.3s ease;
 }
 
 .agendamento-actions button:last-child:hover,
 .pet-actions button:last-child:hover,
 .servico-actions button:last-child:hover {
-    background-color: #e74c3c; /* Red background on hover */
-    color: white; /* White text on hover */
-    border-color: #e74c3c; /* Match border color to background */
+    background-color: #e74c3c; 
+    color: white; 
+    border-color: #e74c3c;
 }

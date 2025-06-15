@@ -33,6 +33,15 @@ const EditarAgendamento: React.FC = () => {
   const [precoServico, setPrecoServico] = useState<string>('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '1') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     document.title = 'Editar Agendamento - Click Pet';
 
     // Buscar serviços do banco de dados
@@ -358,7 +367,7 @@ const EditarAgendamento: React.FC = () => {
             onChange={handleChange}
           />
 
-          <label htmlFor="hora">Horário:</label>
+          <label htmlFor="hora">Horário(08:00-20:00):</label>
           <input
             type="time"
             id="hora"

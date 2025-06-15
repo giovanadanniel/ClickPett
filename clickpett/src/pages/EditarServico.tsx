@@ -15,6 +15,15 @@ export default function EditarServico() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '2') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
     if (!token) {
       Swal.fire({
         title: 'Erro',

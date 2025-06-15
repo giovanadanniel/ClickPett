@@ -22,6 +22,15 @@ const MeusAgendamentos: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    const papelUsuario = localStorage.getItem('papelUsuario');
+
+    if (!token || papelUsuario !== '1') {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     document.title = 'Meus Agendamentos - Click Pet';
 
     axios.get('http://localhost:5000/api/meus-agendamentos', {

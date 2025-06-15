@@ -244,7 +244,7 @@ const AgendarServico = () => {
             onChange={handleChange}
           />
 
-          <label htmlFor="hora">Horário:</label>
+          <label htmlFor="hora">Horário(08:00-20:00):</label>
           <input
             type="time"
             id="hora"
