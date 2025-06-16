@@ -212,7 +212,11 @@ const EditarAgendamento: React.FC = () => {
       const horaAtual = hoje.getHours();
       const minutosAtuais = hoje.getMinutes();
 
-      if (horaSelecionada < horaAtual || (horaSelecionada === horaAtual && minutosSelecionados < minutosAtuais)) {
+      // Comparar horas e minutos
+      if (
+        horaSelecionada < horaAtual ||
+        (horaSelecionada === horaAtual && minutosSelecionados <= minutosAtuais)
+      ) {
         return Swal.fire({
           title: 'Erro',
           text: 'O horário selecionado já passou!',

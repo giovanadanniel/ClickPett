@@ -160,6 +160,34 @@ const AgendarServico = () => {
       });
     }
 
+    // Validação: Se a data for hoje, o horário não pode ter passado
+    const hoje = new Date();
+    const dataSelecionada = new Date(data);
+    const [horaSelecionada, minutosSelecionados] = hora.split(':').map(Number);
+
+    // Ajustar a comparação para o fuso horário local
+    const hojeUTC = new Date(hoje.getTime() + hoje.getTimezoneOffset() * 60000);
+    const dataSelecionadaUTC = new Date(dataSelecionada.getTime() + dataSelecionada.getTimezoneOffset() * 60000);
+
+    if (dataSelecionadaUTC.toDateString() === hojeUTC.toDateString()) {
+      const horaAtual = hoje.getHours();
+      const minutosAtuais = hoje.getMinutes();
+
+      // Comparar horas e minutos
+      if (
+        horaSelecionada < horaAtual ||
+        (horaSelecionada === horaAtual && minutosSelecionados <= minutosAtuais)
+      ) {
+        return Swal.fire({
+          title: 'Erro',
+          text: 'O horário selecionado já passou!',
+          icon: 'error',
+          background: '#fff',
+          color: '#000',
+        });
+      }
+    }
+
     try {
       const response = await axios.post(
         'http://localhost:5000/api/agendamento',
