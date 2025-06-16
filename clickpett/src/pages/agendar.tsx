@@ -169,30 +169,28 @@ const AgendarServico = () => {
     const hojeUTC = new Date(hoje.getTime() + hoje.getTimezoneOffset() * 60000);
     const dataSelecionadaUTC = new Date(dataSelecionada.getTime() + dataSelecionada.getTimezoneOffset() * 60000);
 
-    // Validação: Horário permitido é das 08:00 às 20:00 e não pode ser no passado se for hoje
+    // Validação: Horário permitido é das 08:00 às 20:00
+    if (horaSelecionada < 8 || horaSelecionada > 20 || (horaSelecionada === 20 && minutosSelecionados > 0)) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O horário permitido para agendamento é das 08:00 às 20:00!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    // Se a data for hoje, o horário não pode ter passado
     if (dataSelecionadaUTC.toDateString() === hojeUTC.toDateString()) {
       const horaAtual = hoje.getHours();
       const minutosAtuais = hoje.getMinutes();
       if (
-        horaSelecionada < 8 ||
-        horaSelecionada > 20 ||
-        (horaSelecionada === 20 && minutosSelecionados > 0) ||
         horaSelecionada < horaAtual ||
         (horaSelecionada === horaAtual && minutosSelecionados <= minutosAtuais)
       ) {
         return Swal.fire({
           title: 'Erro',
-          text: 'O horário permitido para agendamento é das 08:00 às 20:00 e não pode ser no passado!',
-          icon: 'error',
-          background: '#fff',
-          color: '#000',
-        });
-      }
-    } else {
-      if (horaSelecionada < 8 || horaSelecionada > 20 || (horaSelecionada === 20 && minutosSelecionados > 0)) {
-        return Swal.fire({
-          title: 'Erro',
-          text: 'O horário permitido para agendamento é das 08:00 às 20:00!',
+          text: 'O horário selecionado já passou!',
           icon: 'error',
           background: '#fff',
           color: '#000',
