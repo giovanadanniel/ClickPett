@@ -192,19 +192,27 @@ app.get('/api/usuario', authenticateToken, (req, res) => {
   });
 });
 
-app.put('/api/usuario', authenticateToken, (req, res) => {
+app.put('/api/usuario', authenticateToken, async (req, res) => {
   const userId = req.user.id;
-  const { nome, email, telefone, cpf } = req.body;
+  const { nome, email, telefone, cpf, senha } = req.body;
 
-  const sql = `UPDATE Cliente SET Nome_Cliente = ?, E_mail = ?, Telefone = ?, CPF = ? WHERE ID_Cliente = ?`;
-  db.query(sql, [nome, email, telefone, cpf, userId], (err, result) => {
-    if (err) {
-      console.error('Erro ao atualizar dados do usuário:', err);
-      return res.status(500).json({ error: 'Erro ao atualizar dados do usuário!' });
+  try {
+    // Atualizar os dados do usuário
+    const sql = `UPDATE Cliente SET Nome_Cliente = ?, E_mail = ?, Telefone = ?, CPF = ? WHERE ID_Cliente = ?`;
+    await db.promise().query(sql, [nome, email, telefone, cpf, userId]);
+
+    // Atualizar a senha, se fornecida
+    if (senha) {
+      const senhaHash = await bcrypt.hash(senha, 10);
+      const sqlSenha = `UPDATE Cliente SET Senha = ? WHERE ID_Cliente = ?`;
+      await db.promise().query(sqlSenha, [senhaHash, userId]);
     }
 
     res.status(200).json({ message: 'Dados atualizados com sucesso!' });
-  });
+  } catch (err) {
+    console.error('Erro ao atualizar dados do usuário:', err);
+    res.status(500).json({ error: 'Erro ao atualizar dados do usuário!' });
+  }
 });
 
 app.delete('/api/usuario', authenticateToken, (req, res) => {

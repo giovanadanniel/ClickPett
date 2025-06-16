@@ -17,6 +17,7 @@ export default function EditarConta() {
     cpf: '',
     senha: '',
   });
+  const [senhaVisivel, setSenhaVisivel] = useState(false); // Estado para alternar visibilidade da senha
 
   const token = localStorage.getItem('token'); // Recuperar o token do usuário logado
   const navigate = useNavigate(); // Para redirecionar após salvar as alterações
@@ -76,10 +77,10 @@ const formatarCPF = (cpf: string) => {
 
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
-  const { nome, email, telefone, senha } = form;
+  const { nome, email, telefone, senha, cpf } = form; // Incluí o CPF no destructuring
 
-  // Validação de nome: mínimo 3 letras e apenas letras
-  const nomeRegex = /^[a-zA-Z\s]{3,}$/;
+  // Validação de nome: mínimo 3 letras e apenas letras (incluindo acentos)
+  const nomeRegex = /^[a-zA-ZÀ-ÿ\s]{3,}$/;
   if (!nomeRegex.test(nome)) {
     return Swal.fire({
       title: 'Erro',
@@ -167,15 +168,23 @@ const handleSubmit = async (e: FormEvent) => {
   }
 
   const telefoneSemFormatacao = telefone.replace(/\D/g, '');
+  const cpfSemFormatacao = cpf.replace(/\D/g, ''); // Remove pontos e traços do CPF
 
   try {
+    const body: any = { nome, email, telefone: telefoneSemFormatacao, cpf: cpfSemFormatacao };
+
+    // Adiciona a senha ao corpo da requisição apenas se o campo for preenchido
+    if (senha.trim()) {
+      body.senha = senha;
+    }
+
     const response = await fetch('http://localhost:5000/api/usuario', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ nome, email, telefone: telefoneSemFormatacao, senha }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -330,7 +339,21 @@ const handleDeleteAccount = async () => {
               </div>
               <div className="form-group">
                 <label htmlFor="senha">Senha</label>
-                <input type="password" id="senha" value={form.senha} onChange={handleChange} placeholder="Digite uma nova senha (opcional)" />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={senhaVisivel ? 'text' : 'password'}
+                    id="senha"
+                    value={form.senha}
+                    onChange={handleChange}
+                    placeholder="Digite uma nova senha (opcional)"
+                  />
+                  <img
+                    src={senhaVisivel ? '/paw-off.svg' : '/paw.svg'}
+                    alt={senhaVisivel ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setSenhaVisivel((v) => !v)}
+                    style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer', width: 22, height: 22 }}
+                  />
+                </div>
               </div>
               <button type="submit" className="register-btn">Salvar Alterações</button>
               <div className="form-group">
