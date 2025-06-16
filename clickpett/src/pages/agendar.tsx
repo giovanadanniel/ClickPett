@@ -220,6 +220,17 @@ const AgendarServico = () => {
       });
     }
 
+    // Validação: Horário permitido é das 08:00 às 20:00
+    if (horaSelecionada < 8 || (horaSelecionada === 20 && minutosSelecionados > 0) || horaSelecionada > 20) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'O horário permitido para agendamento é das 08:00 às 20:00!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     try {
       const response = await axios.post(
         'http://localhost:5000/api/agendamento',
