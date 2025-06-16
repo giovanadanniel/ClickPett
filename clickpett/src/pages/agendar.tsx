@@ -188,6 +188,38 @@ const AgendarServico = () => {
       }
     }
 
+    // Validação: Data não pode ser passada
+    const hojeSemHoras = new Date();
+    hojeSemHoras.setHours(0, 0, 0, 0);
+
+    const hojeSemHorasUTC = hojeSemHoras.toISOString().split('T')[0];
+    const dataSelecionadaSemHorasUTC = dataSelecionada.toISOString().split('T')[0];
+
+    if (dataSelecionadaSemHorasUTC < hojeSemHorasUTC) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'A data deve ser hoje ou futura!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
+    // Validação: Data pode ser no máximo um ano à frente
+    const umAnoDepois = new Date();
+    umAnoDepois.setFullYear(hoje.getFullYear() + 1);
+    const umAnoDepoisUTC = umAnoDepois.toISOString().split('T')[0];
+
+    if (dataSelecionadaSemHorasUTC > umAnoDepoisUTC) {
+      return Swal.fire({
+        title: 'Erro',
+        text: 'A data não pode ser mais de um ano à frente!',
+        icon: 'error',
+        background: '#fff',
+        color: '#000',
+      });
+    }
+
     try {
       const response = await axios.post(
         'http://localhost:5000/api/agendamento',
